@@ -7,7 +7,7 @@ const solc_1 = __importDefault(require("solc"));
 const error_1 = require("./error");
 const globContracts_1 = require("./globContracts");
 class SolCompiler {
-    constructor(_config = globContracts_1.config, _compilerOutputSelection, _runs = 100) {
+    constructor(_config, _compilerOutputSelection, _runs = 100) {
         this._config = _config;
         this._compilerOutputSelection = _compilerOutputSelection;
         this._runs = _runs;

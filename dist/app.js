@@ -40,6 +40,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const contract_1 = __importStar(require("./contract"));
 const accountManager_1 = __importDefault(require("./accountManager"));
+const fs_1 = __importDefault(require("fs"));
+const solcConfig_1 = __importDefault(require("./solcConfig"));
+const compiledContract = JSON.parse(fs_1.default.readFileSync(solcConfig_1.default.contracts.cache).toString());
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     // const Person = `
     // type Person {
@@ -67,7 +70,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     // await resolver.addRow({input: {name: 'A10', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
     // await resolver.commit();
     // file.currentBlocks.forEach(b => console.log(b.buffer));
-    contract_1.default.init(contract_1.ThetaLocalnet);
+    contract_1.default.init(contract_1.ThetaLocalnet, compiledContract);
     const crt = new contract_1.default('0x690b076B0442c445CbE7ba50F8245E60f6BE9dD1');
     // await crt.deploy({
     //     name: 'Testing',

@@ -1,9 +1,9 @@
-import SolCompiler from "./solc/compileSol";
+import SolCompiler, { userConfiguration } from "./solc/compileSol";
 import fs from 'fs';
-import config from './solcConfig'
+import config from './solcConfig';
 
-const compile = () => {
-    const compiler = new SolCompiler(undefined, {
+const compile = (config: userConfiguration) => {
+    const compiler = new SolCompiler(config, {
         '*' : {
             'ShareableStorage' : ['abi', 'evm.bytecode']
         }
@@ -12,4 +12,4 @@ const compile = () => {
     fs.writeFileSync(config.contracts.cache, JSON.stringify(contracts.ShareableStorage));
 }
 
-compile();
+compile(config);

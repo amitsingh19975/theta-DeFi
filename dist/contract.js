@@ -14,18 +14,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ContractMethod = exports.CallMethod = exports.SendMethod = exports.AccessLevel = exports.fromWei = exports.toWei = exports.toHex = exports.ThetaLocalnet = exports.ThetaTestnet = exports.ThetaMainnet = void 0;
 const web3_1 = __importDefault(require("web3"));
-const fs_1 = __importDefault(require("fs"));
-const solcConfig_1 = __importDefault(require("./solcConfig"));
 const accountManager_1 = __importDefault(require("./accountManager"));
 const edgeStore_1 = require("./edgeStore");
 exports.ThetaMainnet = ['https://eth-rpc-api.thetatoken.org/rpc', 361];
 exports.ThetaTestnet = ['https://eth-rpc-api-testnet.thetatoken.org/rpc', 365];
 exports.ThetaLocalnet = ['http://127.0.0.1:18888/rpc', 366];
-const readCompiledContract = () => {
-    const data = fs_1.default.readFileSync(solcConfig_1.default.contracts.cache);
-    return JSON.parse(data.toString());
-};
-const compiledContract = readCompiledContract();
 exports.toHex = web3_1.default.utils.toHex;
 const toWei = (val, unit) => {
     switch (typeof val) {
@@ -71,23 +64,24 @@ class ShareableStorage {
     constructor(address) {
         this._transcationHash = null;
         this._address = null;
-        if (!ShareableStorage._web || !ShareableStorage._chainId)
+        if (!ShareableStorage._web || !ShareableStorage._chainId || !ShareableStorage._compiledContract)
             throw new Error('[ShareableStorage]: "init" was not called!');
         this._address = address || null;
-        this._contract = new ShareableStorage._web.eth.Contract(compiledContract.abi, address || undefined);
+        this._contract = new ShareableStorage._web.eth.Contract(ShareableStorage._compiledContract.abi, address || undefined);
     }
-    static init(chain) {
+    static init(chain, compiledContract) {
         this._chainId = chain[1];
         this._web = new web3_1.default(chain[0]);
+        this._compiledContract = compiledContract;
     }
     get address() { return this._address; }
     get transcationHash() { return this._transcationHash; }
     deploy(args, gas, gasPrice) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!ShareableStorage._web || !ShareableStorage._chainId)
+            if (!ShareableStorage._web || !ShareableStorage._chainId || !ShareableStorage._compiledContract)
                 throw new Error('[ShareableStorage]: "init" was not called!');
             const payload = {
-                data: compiledContract.evm.bytecode.object,
+                data: ShareableStorage._compiledContract.evm.bytecode.object,
                 arguments: [args.name, args.blockAddress, args.rPrice, args.rwPrice]
             };
             const params = {

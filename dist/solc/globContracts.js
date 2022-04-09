@@ -3,11 +3,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.globSolFiles = exports.config = void 0;
+exports.globSolFiles = void 0;
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
-const solcConfig_1 = __importDefault(require("../solcConfig"));
-exports.config = solcConfig_1.default;
 const globSolFilesHelper = (path, relPath = '') => {
     const files = fs_1.default.readdirSync(path, { withFileTypes: true });
     let res = [];

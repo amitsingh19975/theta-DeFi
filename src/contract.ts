@@ -3,8 +3,6 @@ import Web3 from 'web3';
 import { BlockAddress } from "./block";
 import { AbiItem, Unit } from "web3-utils";
 import { Contract, DeployOptions, SendOptions } from "web3-eth-contract";
-import fs from 'fs';
-import config from './solcConfig'
 import AccountManager from "./accountManager";
 import { BasicMarketPayloadType, market, MarketMethod } from "./edgeStore";
 import { TableMetadataType } from "./fsInternal/tableFile";
@@ -15,14 +13,6 @@ export type ChainType = [string, number];
 export const ThetaMainnet: ChainType = ['https://eth-rpc-api.thetatoken.org/rpc', 361];
 export const ThetaTestnet: ChainType = ['https://eth-rpc-api-testnet.thetatoken.org/rpc', 365];
 export const ThetaLocalnet: ChainType = ['http://127.0.0.1:18888/rpc', 366]
-
-const readCompiledContract = () => {
-    const data = fs.readFileSync(config.contracts.cache);
-    return JSON.parse(data.toString()) as ContractInfoType;
-}
-
-const compiledContract = readCompiledContract();
-
 
 export const toHex = Web3.utils.toHex;
 
@@ -99,33 +89,35 @@ export const ContractMethod = {
 }
 
 export default class ShareableStorage {
+    static _compiledContract?: ContractInfoType;
     static _web?: Web3;
     static _chainId?: number
     private _contract: Contract;
     private _transcationHash: BlockAddress = null;
     private _address: BlockAddress = null;
 
-    static init(chain: ChainType) : void {
+    static init(chain: ChainType, compiledContract: ContractInfoType) : void {
         this._chainId = chain[1];
         this._web = new Web3(chain[0]);
+        this._compiledContract = compiledContract;
     }
     
     get address() : BlockAddress { return this._address; }
     get transcationHash() : BlockAddress { return this._transcationHash; }
 
     constructor(address?: BlockAddress){
-        if(!ShareableStorage._web || !ShareableStorage._chainId)
+        if(!ShareableStorage._web || !ShareableStorage._chainId || !ShareableStorage._compiledContract)
             throw new Error('[ShareableStorage]: "init" was not called!');
         this._address = address || null;
-        this._contract = new ShareableStorage._web.eth.Contract(compiledContract.abi as AbiItem[], address || undefined);
+        this._contract = new ShareableStorage._web.eth.Contract(ShareableStorage._compiledContract.abi as AbiItem[], address || undefined);
     }
 
     async deploy(args: ContractArgumentType, gas?: number, gasPrice?: string) : Promise<void> {
-        if(!ShareableStorage._web || !ShareableStorage._chainId)
+        if(!ShareableStorage._web || !ShareableStorage._chainId || !ShareableStorage._compiledContract)
             throw new Error('[ShareableStorage]: "init" was not called!');
 
         const payload: DeployOptions = {
-            data: compiledContract.evm.bytecode.object,
+            data: ShareableStorage._compiledContract.evm.bytecode.object,
             arguments: [args.name, args.blockAddress, args.rPrice, args.rwPrice]
         }
 

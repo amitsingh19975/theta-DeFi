@@ -6,14 +6,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const compileSol_1 = __importDefault(require("./solc/compileSol"));
 const fs_1 = __importDefault(require("fs"));
 const solcConfig_1 = __importDefault(require("./solcConfig"));
-const compile = () => {
-    const compiler = new compileSol_1.default(undefined, {
+const compile = (config) => {
+    const compiler = new compileSol_1.default(config, {
         '*': {
             'ShareableStorage': ['abi', 'evm.bytecode']
         }
     });
     const contracts = compiler.compile();
-    fs_1.default.writeFileSync(solcConfig_1.default.contracts.cache, JSON.stringify(contracts.ShareableStorage));
+    fs_1.default.writeFileSync(config.contracts.cache, JSON.stringify(contracts.ShareableStorage));
 };
-compile();
+compile(solcConfig_1.default);
 //# sourceMappingURL=solDriver.js.map

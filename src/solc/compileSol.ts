@@ -1,11 +1,12 @@
 import solc from 'solc';
 import { ErrorObjectType, throwOrWarnSolError } from './error';
 
-import { globSolFiles, config } from './globContracts';
+import { globSolFiles } from './globContracts';
 
 export type userConfiguration = {
     contracts: {
-        path: string
+        path: string,
+        cache: string,
     } 
 }
 
@@ -173,7 +174,7 @@ export default class SolCompiler {
     private _output: SolOutputType = { sources: {}, contracts: {} };
     private _contracts: ContractNameType = {};
 
-    constructor(private readonly _config: userConfiguration = config, private readonly _compilerOutputSelection?: OutputSelectionType, private readonly _runs = 100) {}
+    constructor(private readonly _config: userConfiguration, private readonly _compilerOutputSelection?: OutputSelectionType, private readonly _runs = 100) {}
 
     get output() : SolOutputType { return this._output; }
 
