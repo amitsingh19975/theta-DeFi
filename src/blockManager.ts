@@ -30,10 +30,12 @@ const roughSizeOfObject = ( object: BlockType ) => {
         )
         {
             objectList.push( value );
-
-            for( const i in value ) {
-                stack.push( value[i] );
+            if(value !== null) {
+                for( const i of Object.values(value) ) {
+                    stack.push( i );
+                }
             }
+
         }
     }
     return bytes;
