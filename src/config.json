@@ -1,0 +1,10 @@
+{
+    "protocol" : "http://",
+    "domain" : "127.0.0.1",
+    "port": 19888,
+    "jsonrpc": "2.0",
+    "market" : {
+        "domain": "127.0.0.1",
+        "port": 8080
+    }
+}
