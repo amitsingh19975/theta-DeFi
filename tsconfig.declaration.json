@@ -4,6 +4,6 @@
       "module": "amd",
       "declaration": true,
       "emitDeclarationOnly": true,
-      "outFile": "index.d.ts"
+      "outFile": "types/index.d.ts"
     }
   }
