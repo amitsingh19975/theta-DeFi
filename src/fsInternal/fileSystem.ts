@@ -84,6 +84,7 @@ export class FileSystem {
 
     get name() : string { return this._name; }
     set name(newName: string) { this._name = newName; }
+    get realName() : string { return this.isRoot() ? '/' : this.name; }
 
     get parent() : Directory | null { return this._parent? this._parent.asDir() : null; }
     set parent(newParent: Directory | null) { this.setNewParent(newParent); }
