@@ -38,7 +38,7 @@ const getDefinationNode = (node: DocumentNode) => {
     return null
 }
 
-export const defaultMapFn = (data: AcceptableType) => {
+export const defaultMapFn: (data: AcceptableType) => AcceptableType = (data: AcceptableType) => {
     if(Array.isArray(data)){
         return data.map(defaultMapFn);
     }else if(typeof data === 'string'){
@@ -242,17 +242,20 @@ const mapTypeHelper = (type: NamedTypeNode, arrD: number, canBeNull: boolean[]) 
         throw new Error('Unsupported Type!');
 }
 
-const mapType = (type: TypeNode, arrD = 0, canBeNull = [] as boolean[], shouldPush = true) => {
-    const isNonNull = type.kind === Kind.NON_NULL_TYPE;
-    if(shouldPush){
-        canBeNull.push(!isNonNull);
-    }
+const mapType: (type: TypeNode, arrD?: number, canBeNull?: boolean[], shouldPush?: boolean) => BasicType
+    = (type: TypeNode, arrD = 0, canBeNull = [] as boolean[], shouldPush = true) => {
+        const isNonNull = type.kind === Kind.NON_NULL_TYPE;
+        if(shouldPush){
+            canBeNull.push(!isNonNull);
+        }
 
-    if(type.kind === Kind.NAMED_TYPE){
-        return mapTypeHelper(type, arrD, canBeNull);
-    }else if(type.kind === Kind.LIST_TYPE){
-        return mapType(type.type, arrD + 1, canBeNull);
-    }else if(type.kind === Kind.NON_NULL_TYPE){
-        return mapType(type.type, arrD, canBeNull, false);
+        if(type.kind === Kind.NAMED_TYPE){
+            return mapTypeHelper(type, arrD, canBeNull);
+        }else if(type.kind === Kind.LIST_TYPE){
+            return mapType(type.type, arrD + 1, canBeNull);
+        }else if(type.kind === Kind.NON_NULL_TYPE){
+            return mapType(type.type, arrD, canBeNull, false);
+        }
+        
+        throw new Error('["mapType"]: unkown type!');
     }
-}

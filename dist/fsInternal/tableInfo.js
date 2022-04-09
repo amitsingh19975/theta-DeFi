@@ -216,5 +216,6 @@ const mapType = (type, arrD = 0, canBeNull = [], shouldPush = true) => {
     else if (type.kind === graphql_1.Kind.NON_NULL_TYPE) {
         return mapType(type.type, arrD, canBeNull, false);
     }
+    throw new Error('["mapType"]: unkown type!');
 };
 //# sourceMappingURL=tableInfo.js.map

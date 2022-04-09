@@ -75,7 +75,7 @@ export default class RangeCache {
     }
 
     delete(indexOrAddress: number|BlockAddress) : void {
-        const tempFn = (idx) => {
+        const tempFn = (idx: number) => {
             if(idx === this._start) ++this._start;
             else if(idx === this._end) --this._end;
         };
