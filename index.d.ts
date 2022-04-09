@@ -1,4 +1,3 @@
-/// <reference types="bn.js" />
 declare module "accountManager" {
     import Web3 from 'web3';
     export default class AccountManager {
@@ -460,7 +459,7 @@ declare module "fsInternal/tableInfo" {
         map: MapType;
         filter: FilterType;
     };
-    export const defaultMapFn: (data: AcceptableType) => any;
+    export const defaultMapFn: (data: AcceptableType) => AcceptableType;
     export const defaultFilterFn: () => boolean;
     export type TableInfoInterface = {
         tableName: string;

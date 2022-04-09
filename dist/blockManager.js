@@ -36,8 +36,10 @@ const roughSizeOfObject = (object) => {
         else if (typeof value === 'object'
             && objectList.indexOf(value) === -1) {
             objectList.push(value);
-            for (const i in value) {
-                stack.push(value[i]);
+            if (value !== null) {
+                for (const i of Object.values(value)) {
+                    stack.push(i);
+                }
             }
         }
     }
