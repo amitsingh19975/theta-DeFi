@@ -11,6 +11,9 @@
         "strict": true,
         "noImplicitAny": false,
         "skipLibCheck": true,
+        "types": [
+            "./src/solc",
+        ],
     },
     "lib": ["es2021"],
     "include": ["src"],
