@@ -1,7 +1,7 @@
 import axios from "axios";
 import { Block, BlockAddress, BlockType } from "./block";
 import ThetaConfig from './config.json'
-import { TableMetadataType } from "./fs/tableFile";
+import { TableMetadataType } from "./fsInternal/tableFile";
 
 export const MAX_BLOCK_SIZE = 1024;
 

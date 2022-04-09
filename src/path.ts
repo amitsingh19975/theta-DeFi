@@ -1,5 +1,5 @@
-import { Directory } from './fs/directory';
-import { FileSystem } from './fs/fileSystem';
+import { Directory } from './fsInternal/directory';
+import { FileSystem } from './fsInternal/fileSystem';
 
 export enum ComponentKind {
     RootDir,

@@ -12,92 +12,6 @@ declare module "accountManager" {
         address: string;
     }>;
 }
-declare module "fs/types" {
-    enum Type {
-        Int = 0,
-        Float = 1,
-        String = 2,
-        Boolean = 3
-    }
-    export type BasicAcceptableType = number | string | boolean | null;
-    export type AcceptableType = BasicAcceptableType | AcceptableType[];
-    export class BasicType {
-        private readonly _type;
-        private readonly _canBeNull;
-        readonly _arrayDepth: number;
-        constructor(_type: Type, canBeNull?: boolean[] | boolean, arrayDepth?: number);
-        get isInt(): boolean;
-        get isFloat(): boolean;
-        get isStr(): boolean;
-        get isBool(): boolean;
-        private typeToGraphQLType;
-        private toStringHelper;
-        toString(): string;
-        canBeNull(depth?: number): boolean;
-        private checkConstraintsHelper;
-        private checkConstraintsArray;
-        checkConstraints(val: AcceptableType): [boolean, string];
-    }
-    export function Int(canBeNullDepth?: boolean[] | boolean, arrayDepth?: number): BasicType;
-    export function Str(canBeNullDepth?: boolean[] | boolean, arrayDepth?: number): BasicType;
-    export function Bool(canBeNullDepth?: boolean[] | boolean, arrayDepth?: number): BasicType;
-    export function Float(canBeNullDepth?: boolean[] | boolean, arrayDepth?: number): BasicType;
-}
-declare module "fs/fileSystem" {
-    import { Directory, SerializationType } from "fs/directory";
-    import File from "fs/file";
-    export enum NodeType {
-        None = 0,
-        File = 1,
-        Dir = 2
-    }
-    export class FileSystem {
-        private _name;
-        private _parent;
-        private _type;
-        protected _size: number;
-        constructor(parent: Directory | null, name: string, type: NodeType, size?: number, isRoot?: boolean);
-        private setNewParent;
-        private setSize;
-        protected addSizeUsingNode(node: FileSystem | null): void;
-        protected removeSizeUsingNode(node: FileSystem | null): void;
-        get name(): string;
-        set name(newName: string);
-        get parent(): Directory | null;
-        set parent(newParent: Directory | null);
-        get type(): NodeType;
-        get size(): number;
-        set size(size: number);
-        forEach(fn: (node: FileSystem) => void): void;
-        private forEachHelper;
-        isDir(): this is Directory;
-        isFile(): this is File;
-        asDir(): Directory | null;
-        asFile(): File | null;
-        isRoot(): boolean;
-        asNode(): FileSystem;
-        isEqual(node: FileSystem, strict?: boolean): boolean;
-        serialize(): SerializationType;
-        private serializeHelper;
-    }
-}
-declare module "fs/imageFile" {
-    import { Directory } from "fs/directory";
-    import { BlockAddress } from "block";
-    import File, { FileSerializeType } from "fs/file";
-    export type ImageSerializeType = {
-        height: number;
-        width: number;
-    };
-    export default class ImageFile extends File {
-        protected _initialBlockAddress: BlockAddress;
-        private _height;
-        private _width;
-        protected constructor(parent: Directory | null, name: string, _initialBlockAddress: BlockAddress, height: number, width: number);
-        get blockAddress(): BlockAddress;
-        serialize(): FileSerializeType;
-    }
-}
 declare module "solc/error" {
     type ErrorType = 'TypeError' | 'JSONError' | 'IOError' | 'ParserError' | 'DocstringParsingError' | 'SyntaxError' | 'DeclarationError' | 'UnimplementedFeatureError' | 'InternalCompilerError' | 'Exception' | 'CompilerError' | 'FatalError' | 'Warning' | 'DocstringParsingError';
     type SeverityType = 'error' | 'warning' | 'info';
@@ -358,97 +272,67 @@ declare module "solc/compileSol" {
         get contracts(): ContractNameType;
     }
 }
-declare module "contract" {
-    import Web3 from 'web3';
-    import { BlockAddress } from "block";
-    import { Unit } from "web3-utils";
-    import { BasicMarketPayloadType } from "edgeStore";
-    import { TableMetadataType } from "fs/tableFile";
-    import BN from "bn.js";
-    export type ChainType = [string, number];
-    export const ThetaMainnet: ChainType;
-    export const ThetaTestnet: ChainType;
-    export const ThetaLocalnet: ChainType;
-    export const toHex: (value: string | number | BN) => string;
-    export const toWei: (val: string | number | BN, unit?: Unit | undefined) => string | BN;
-    export const fromWei: (val: string | number | BN, unit?: Unit | undefined) => string;
-    export type ContractArgumentType = {
-        name: string;
-        blockAddress: string;
-        rPrice: string | BN;
-        rwPrice: string | BN;
-    };
-    export enum AccessLevel {
-        NONE = 0,
-        READ = 1,
-        RW = 2
+declare module "fsInternal/fileSystem" {
+    import { Directory, SerializationType } from "fsInternal/directory";
+    import File from "fsInternal/file";
+    export enum NodeType {
+        None = 0,
+        File = 1,
+        Dir = 2
     }
-    export const SendMethod = "send";
-    export const CallMethod = "call";
-    type MethodType = 'name' | 'symbol' | 'buy' | 'updatePrices' | 'decimals' | 'minAccessLevel' | 'maxAccessLevel' | 'updatePermission' | 'currentAccessLevel' | 'amountToPayForLevel' | 'getBlockAddress' | 'updateBlockAddress' | 'myAccessLevel' | 'hasNoPerm' | 'hasRPerm' | 'hasRWPerm' | 'getPrices' | 'isOwner';
-    type ContractMethodValueType = [MethodType, 'call' | 'send'];
-    export const ContractMethod: {
-        Name: ContractMethodValueType;
-        Symbol: ContractMethodValueType;
-        Buy: ContractMethodValueType;
-        UpdatePrices: ContractMethodValueType;
-        Decimals: ContractMethodValueType;
-        MinAccessLevel: ContractMethodValueType;
-        MaxAccessLevel: ContractMethodValueType;
-        UpdatePermission: ContractMethodValueType;
-        CurrentAccessLevel: ContractMethodValueType;
-        AmountToPayForLevel: ContractMethodValueType;
-        GetBlockAddress: ContractMethodValueType;
-        UpdateBlockAddress: ContractMethodValueType;
-        MyAccessLevel: ContractMethodValueType;
-        HasNoPerm: ContractMethodValueType;
-        HasRPerm: ContractMethodValueType;
-        HasRWPerm: ContractMethodValueType;
-        GetPrices: ContractMethodValueType;
-        IsOwner: ContractMethodValueType;
-    };
-    export default class ShareableStorage {
-        static _web?: Web3;
-        static _chainId?: number;
-        private _contract;
-        private _transcationHash;
-        private _address;
-        static init(chain: ChainType): void;
-        get address(): BlockAddress;
-        get transcationHash(): BlockAddress;
-        constructor(address?: BlockAddress);
-        deploy(args: ContractArgumentType, gas?: number, gasPrice?: string): Promise<void>;
-        private _checkAddress;
-        updatePrice(rPrice: string, rwPrice: string): Promise<void>;
-        name(): Promise<string | Error>;
-        symbol(): Promise<string | Error>;
-        buy(level: AccessLevel, price: string | BN): Promise<Record<string, unknown> | Error>;
-        decimals(): Promise<number | Error>;
-        minAccessLevel(): Promise<AccessLevel | Error>;
-        maxAccessLevel(): Promise<AccessLevel | Error>;
-        getBlockAddress(): Promise<string | Error>;
-        currentAccessLevel(clientAddress?: BlockAddress): Promise<AccessLevel | Error>;
-        myAccessLevel(): Promise<AccessLevel | Error>;
-        hasNoPerm(): Promise<boolean | Error>;
-        hasReadPerm(): Promise<boolean | Error>;
-        hasReadWritePerm(): Promise<boolean | Error>;
-        isOwner(): Promise<boolean | Error>;
-        getPrices(): Promise<string[] | Error>;
-        updatePermission(clientAddress: BlockAddress, level: AccessLevel): Promise<Record<string, unknown> | Error>;
-        amountToPayForLevel(level: AccessLevel): Promise<Record<string, unknown> | Error>;
-        updateBlockAddress(blockAddress: BlockAddress): Promise<Record<string, unknown> | Error>;
-        call(method: ContractMethodValueType, args?: unknown[], price?: string | BN): Promise<unknown | Error>;
-        static sellTableOnMarket(address: BlockAddress, desc: BasicMarketPayloadType & {
-            tableInfo: TableMetadataType;
-        }): Promise<ShareableStorage | Error>;
+    export class FileSystem {
+        private _name;
+        private _parent;
+        private _type;
+        protected _size: number;
+        constructor(parent: Directory | null, name: string, type: NodeType, size?: number, isRoot?: boolean);
+        private setNewParent;
+        private setSize;
+        protected addSizeUsingNode(node: FileSystem | null): void;
+        protected removeSizeUsingNode(node: FileSystem | null): void;
+        get name(): string;
+        set name(newName: string);
+        get parent(): Directory | null;
+        set parent(newParent: Directory | null);
+        get type(): NodeType;
+        get size(): number;
+        set size(size: number);
+        forEach(fn: (node: FileSystem) => void): void;
+        private forEachHelper;
+        isDir(): this is Directory;
+        isFile(): this is File;
+        asDir(): Directory | null;
+        asFile(): File | null;
+        isRoot(): boolean;
+        asNode(): FileSystem;
+        isEqual(node: FileSystem, strict?: boolean): boolean;
+        serialize(): SerializationType;
+        private serializeHelper;
     }
 }
-declare module "fs/file" {
-    import { Directory } from "fs/directory";
-    import { NodeType, FileSystem } from "fs/fileSystem";
+declare module "fsInternal/imageFile" {
+    import { Directory } from "fsInternal/directory";
     import { BlockAddress } from "block";
-    import TableFile, { TableFileSerializeType, TableMetadataType } from "fs/tableFile";
-    import { ImageSerializeType } from "fs/imageFile";
+    import File, { FileSerializeType } from "fsInternal/file";
+    export type ImageSerializeType = {
+        height: number;
+        width: number;
+    };
+    export default class ImageFile extends File {
+        protected _initialBlockAddress: BlockAddress;
+        private _height;
+        private _width;
+        protected constructor(parent: Directory | null, name: string, _initialBlockAddress: BlockAddress, height: number, width: number);
+        get blockAddress(): BlockAddress;
+        serialize(): FileSerializeType;
+    }
+}
+declare module "fsInternal/file" {
+    import { Directory } from "fsInternal/directory";
+    import { NodeType, FileSystem } from "fsInternal/fileSystem";
+    import { BlockAddress } from "block";
+    import TableFile, { TableFileSerializeType, TableMetadataType } from "fsInternal/tableFile";
+    import { ImageSerializeType } from "fsInternal/imageFile";
     import ShareableStorage from "contract";
     import { Unit } from "web3-utils";
     export type FileSerializeType = {
@@ -497,9 +381,9 @@ declare module "fs/file" {
         serialize(): FileSerializeType;
     }
 }
-declare module "fs/directory" {
-    import { FileSerializeType } from "fs/file";
-    import { NodeType, FileSystem } from "fs/fileSystem";
+declare module "fsInternal/directory" {
+    import { FileSerializeType } from "fsInternal/file";
+    import { NodeType, FileSystem } from "fsInternal/fileSystem";
     export type SerializationType = DirectorySerializeType | FileSerializeType;
     export type DirectorySerializeType = {
         name: string;
@@ -523,6 +407,84 @@ declare module "fs/directory" {
         removeChildren(children: FileSystem[]): void;
         removeAll(): void;
         serialize(): DirectorySerializeType;
+    }
+}
+declare module "fsInternal/types" {
+    enum Type {
+        Int = 0,
+        Float = 1,
+        String = 2,
+        Boolean = 3
+    }
+    export type BasicAcceptableType = number | string | boolean | null;
+    export type AcceptableType = BasicAcceptableType | AcceptableType[];
+    export class BasicType {
+        private readonly _type;
+        private readonly _canBeNull;
+        readonly _arrayDepth: number;
+        constructor(_type: Type, canBeNull?: boolean[] | boolean, arrayDepth?: number);
+        get isInt(): boolean;
+        get isFloat(): boolean;
+        get isStr(): boolean;
+        get isBool(): boolean;
+        private typeToGraphQLType;
+        private toStringHelper;
+        toString(): string;
+        canBeNull(depth?: number): boolean;
+        private checkConstraintsHelper;
+        private checkConstraintsArray;
+        checkConstraints(val: AcceptableType): [boolean, string];
+    }
+    export function Int(canBeNullDepth?: boolean[] | boolean, arrayDepth?: number): BasicType;
+    export function Str(canBeNullDepth?: boolean[] | boolean, arrayDepth?: number): BasicType;
+    export function Bool(canBeNullDepth?: boolean[] | boolean, arrayDepth?: number): BasicType;
+    export function Float(canBeNullDepth?: boolean[] | boolean, arrayDepth?: number): BasicType;
+}
+declare module "fsInternal/tableInfo" {
+    import { Int, Float, Str, Bool, BasicType, AcceptableType } from "fsInternal/types";
+    import { BlockType } from "block";
+    export { Int, Float, Str, Bool };
+    type MapType = (data: AcceptableType) => AcceptableType;
+    type FilterType = (data: AcceptableType) => boolean;
+    export type FieldType = {
+        name: string;
+        type: BasicType;
+        description?: string;
+        map?: MapType;
+        filter?: FilterType;
+    };
+    type InternalFieldType = {
+        name: string;
+        type: BasicType;
+        description: string;
+        map: MapType;
+        filter: FilterType;
+    };
+    export const defaultMapFn: (data: AcceptableType) => any;
+    export const defaultFilterFn: () => boolean;
+    export type TableInfoInterface = {
+        tableName: string;
+        fields: InternalFieldType[];
+        source: string;
+        description: string;
+    };
+    export class TableInfo {
+        readonly tableName: string;
+        private fields;
+        readonly source: string;
+        description: string;
+        constructor(tableName: string, source?: string, description?: string, fields?: FieldType[]);
+        getField(name: string): InternalFieldType | null;
+        addField(field: FieldType): boolean;
+        get keys(): string[];
+        forEach(callback: (el: InternalFieldType, idx: number, arr: InternalFieldType[]) => void): void;
+        validateType(name: string, data: AcceptableType, callback: (valid: boolean, dataAfterMapping: AcceptableType, err?: string) => void): void;
+        buildRow(args: BlockType): BlockType;
+        updateMapFn(name: string, map: MapType): boolean;
+        updateFilterFn(name: string, filter: FilterType): boolean;
+        static fromGraphQLSource(source: string): TableInfo;
+        serialize(): TableInfoInterface;
+        static deserialize(json: TableInfoInterface): TableInfo;
     }
 }
 declare module "cache" {
@@ -606,8 +568,8 @@ declare module "blockManager" {
     }
 }
 declare module "path" {
-    import { Directory } from "fs/directory";
-    import { FileSystem } from "fs/fileSystem";
+    import { Directory } from "fsInternal/directory";
+    import { FileSystem } from "fsInternal/fileSystem";
     export enum ComponentKind {
         RootDir = 0,
         CurDir = 1,
@@ -631,12 +593,12 @@ declare module "path" {
     }
 }
 declare module "fs" {
-    import { Directory, DirectorySerializeType, SerializationType } from "fs/directory";
-    import File, { FileSerializeType } from "fs/file";
-    import { FileSystem, NodeType } from "fs/fileSystem";
+    import { Directory, DirectorySerializeType, SerializationType } from "fsInternal/directory";
+    import File, { FileSerializeType } from "fsInternal/file";
+    import { FileSystem, NodeType } from "fsInternal/fileSystem";
     import { BlockAddress } from "block";
     import { Path } from "path";
-    import TableFile from "fs/tableFile";
+    import TableFile from "fsInternal/tableFile";
     export { Directory, File, FileSystem, NodeType, Path };
     export const makeDir: (path: string | string[], root?: Directory | undefined) => Directory | null;
     export const makeTable: (name: string, fileInfoOrGraphqlSourceCode?: string | undefined, blockAddress?: BlockAddress | undefined, size?: number | undefined, root?: Directory | undefined) => TableFile;
@@ -649,15 +611,15 @@ declare module "fs" {
     export const getFile: (path: string | string[], root?: Directory | undefined) => File | null;
     export const getSharedFileSystem: (fs: SerializationType, arr?: SerializationType[]) => never;
 }
-declare module "fs/tableFile" {
-    import { Directory } from "fs/directory";
-    import { TableInfo as TableInfo } from "fs/tableInfo";
-    import { TableInfoInterface } from "fs/tableInfo";
+declare module "fsInternal/tableFile" {
+    import { Directory } from "fsInternal/directory";
+    import { TableInfo as TableInfo } from "fsInternal/tableInfo";
+    import { TableInfoInterface } from "fsInternal/tableInfo";
     import { BlockDataType } from "edgeStore";
-    import { AcceptableType } from "fs/types";
+    import { AcceptableType } from "fsInternal/types";
     import { GraphQLSchema } from "graphql";
     import { Block, BlockAddress, BlockType } from "block";
-    import File, { FileSerializeType } from "fs/file";
+    import File, { FileSerializeType } from "fsInternal/file";
     export type TableFileSerializeType = {
         tableInfo: TableInfoInterface;
     };
@@ -708,7 +670,7 @@ declare module "fs/tableFile" {
 }
 declare module "edgeStore" {
     import { Block, BlockAddress, BlockType } from "block";
-    import { TableMetadataType } from "fs/tableFile";
+    import { TableMetadataType } from "fsInternal/tableFile";
     export const MAX_BLOCK_SIZE = 1024;
     export type EdgeStoreConfigType = {
         protocol?: string;
@@ -815,7 +777,7 @@ declare module "edgeStore" {
 }
 declare module "block" {
     import { BlockDataType, RowType } from "edgeStore";
-    import { AcceptableType } from "fs/types";
+    import { AcceptableType } from "fsInternal/types";
     export type BlockAddress = string | null;
     export type BlockType = {
         [key: string | symbol]: AcceptableType;
@@ -842,51 +804,97 @@ declare module "block" {
         serialize(): RowType;
     }
 }
-declare module "fs/tableInfo" {
-    import { Int, Float, Str, Bool, BasicType, AcceptableType } from "fs/types";
-    import { BlockType } from "block";
-    export { Int, Float, Str, Bool };
-    type MapType = (data: AcceptableType) => AcceptableType;
-    type FilterType = (data: AcceptableType) => boolean;
-    export type FieldType = {
+declare module "contract" {
+    import Web3 from 'web3';
+    import { BlockAddress } from "block";
+    import { Unit } from "web3-utils";
+    import { BasicMarketPayloadType } from "edgeStore";
+    import { TableMetadataType } from "fsInternal/tableFile";
+    import BN from "bn.js";
+    export type ChainType = [string, number];
+    export const ThetaMainnet: ChainType;
+    export const ThetaTestnet: ChainType;
+    export const ThetaLocalnet: ChainType;
+    export const toHex: (value: string | number | BN) => string;
+    export const toWei: (val: string | number | BN, unit?: Unit | undefined) => string | BN;
+    export const fromWei: (val: string | number | BN, unit?: Unit | undefined) => string;
+    export type ContractArgumentType = {
         name: string;
-        type: BasicType;
-        description?: string;
-        map?: MapType;
-        filter?: FilterType;
+        blockAddress: string;
+        rPrice: string | BN;
+        rwPrice: string | BN;
     };
-    type InternalFieldType = {
-        name: string;
-        type: BasicType;
-        description: string;
-        map: MapType;
-        filter: FilterType;
+    export enum AccessLevel {
+        NONE = 0,
+        READ = 1,
+        RW = 2
+    }
+    export const SendMethod = "send";
+    export const CallMethod = "call";
+    type MethodType = 'name' | 'symbol' | 'buy' | 'updatePrices' | 'decimals' | 'minAccessLevel' | 'maxAccessLevel' | 'updatePermission' | 'currentAccessLevel' | 'amountToPayForLevel' | 'getBlockAddress' | 'updateBlockAddress' | 'myAccessLevel' | 'hasNoPerm' | 'hasRPerm' | 'hasRWPerm' | 'getPrices' | 'isOwner';
+    type ContractMethodValueType = [MethodType, 'call' | 'send'];
+    export const ContractMethod: {
+        Name: ContractMethodValueType;
+        Symbol: ContractMethodValueType;
+        Buy: ContractMethodValueType;
+        UpdatePrices: ContractMethodValueType;
+        Decimals: ContractMethodValueType;
+        MinAccessLevel: ContractMethodValueType;
+        MaxAccessLevel: ContractMethodValueType;
+        UpdatePermission: ContractMethodValueType;
+        CurrentAccessLevel: ContractMethodValueType;
+        AmountToPayForLevel: ContractMethodValueType;
+        GetBlockAddress: ContractMethodValueType;
+        UpdateBlockAddress: ContractMethodValueType;
+        MyAccessLevel: ContractMethodValueType;
+        HasNoPerm: ContractMethodValueType;
+        HasRPerm: ContractMethodValueType;
+        HasRWPerm: ContractMethodValueType;
+        GetPrices: ContractMethodValueType;
+        IsOwner: ContractMethodValueType;
     };
-    export const defaultMapFn: (data: AcceptableType) => any;
-    export const defaultFilterFn: () => boolean;
-    export type TableInfoInterface = {
-        tableName: string;
-        fields: InternalFieldType[];
-        source: string;
-        description: string;
-    };
-    export class TableInfo {
-        readonly tableName: string;
-        private fields;
-        readonly source: string;
-        description: string;
-        constructor(tableName: string, source?: string, description?: string, fields?: FieldType[]);
-        getField(name: string): InternalFieldType | null;
-        addField(field: FieldType): boolean;
-        get keys(): string[];
-        forEach(callback: (el: InternalFieldType, idx: number, arr: InternalFieldType[]) => void): void;
-        validateType(name: string, data: AcceptableType, callback: (valid: boolean, dataAfterMapping: AcceptableType, err?: string) => void): void;
-        buildRow(args: BlockType): BlockType;
-        updateMapFn(name: string, map: MapType): boolean;
-        updateFilterFn(name: string, filter: FilterType): boolean;
-        static fromGraphQLSource(source: string): TableInfo;
-        serialize(): TableInfoInterface;
-        static deserialize(json: TableInfoInterface): TableInfo;
+    export default class ShareableStorage {
+        static _web?: Web3;
+        static _chainId?: number;
+        private _contract;
+        private _transcationHash;
+        private _address;
+        static init(chain: ChainType): void;
+        get address(): BlockAddress;
+        get transcationHash(): BlockAddress;
+        constructor(address?: BlockAddress);
+        deploy(args: ContractArgumentType, gas?: number, gasPrice?: string): Promise<void>;
+        private _checkAddress;
+        updatePrice(rPrice: string, rwPrice: string): Promise<void>;
+        name(): Promise<string | Error>;
+        symbol(): Promise<string | Error>;
+        buy(level: AccessLevel, price: string | BN): Promise<Record<string, unknown> | Error>;
+        decimals(): Promise<number | Error>;
+        minAccessLevel(): Promise<AccessLevel | Error>;
+        maxAccessLevel(): Promise<AccessLevel | Error>;
+        getBlockAddress(): Promise<string | Error>;
+        currentAccessLevel(clientAddress?: BlockAddress): Promise<AccessLevel | Error>;
+        myAccessLevel(): Promise<AccessLevel | Error>;
+        hasNoPerm(): Promise<boolean | Error>;
+        hasReadPerm(): Promise<boolean | Error>;
+        hasReadWritePerm(): Promise<boolean | Error>;
+        isOwner(): Promise<boolean | Error>;
+        getPrices(): Promise<string[] | Error>;
+        updatePermission(clientAddress: BlockAddress, level: AccessLevel): Promise<Record<string, unknown> | Error>;
+        amountToPayForLevel(level: AccessLevel): Promise<Record<string, unknown> | Error>;
+        updateBlockAddress(blockAddress: BlockAddress): Promise<Record<string, unknown> | Error>;
+        call(method: ContractMethodValueType, args?: unknown[], price?: string | BN): Promise<unknown | Error>;
+        static sellTableOnMarket(address: BlockAddress, desc: BasicMarketPayloadType & {
+            tableInfo: TableMetadataType;
+        }): Promise<ShareableStorage | Error>;
+    }
+}
+declare module "app" { }
+declare module "solDriver" { }
+declare module "utils" {
+    export enum Loop {
+        BREAK = 0,
+        CONTINUE = 1
     }
 }
 declare module "commands/cd" {
@@ -905,14 +913,6 @@ declare module "commands/ls" {
         fullPath: string;
     };
     export const ls: (currNode: Directory, path: string | string[]) => FileInfo[];
-}
-declare module "app" { }
-declare module "solDriver" { }
-declare module "utils" {
-    export enum Loop {
-        BREAK = 0,
-        CONTINUE = 1
-    }
 }
 declare module "commands/utils" {
     export const normalizePath: (path: string | string[]) => string[];

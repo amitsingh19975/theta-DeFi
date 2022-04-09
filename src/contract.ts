@@ -7,7 +7,7 @@ import fs from 'fs';
 import config from './solcConfig'
 import AccountManager from "./accountManager";
 import { BasicMarketPayloadType, market, MarketMethod } from "./edgeStore";
-import { TableMetadataType } from "./fs/tableFile";
+import { TableMetadataType } from "./fsInternal/tableFile";
 import BN from "bn.js";
 
 export type ChainType = [string, number];

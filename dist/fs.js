@@ -27,17 +27,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getSharedFileSystem = exports.getFile = exports.getDir = exports.getDirOrFile = exports.deserializeFileSystem = exports.deserializeFile = exports.deserializeDir = exports.serializeFileSystem = exports.makeTable = exports.makeDir = exports.Path = exports.NodeType = exports.FileSystem = exports.File = exports.Directory = void 0;
-const directory_1 = require("./fs/directory");
+const directory_1 = require("./fsInternal/directory");
 Object.defineProperty(exports, "Directory", { enumerable: true, get: function () { return directory_1.Directory; } });
-const file_1 = __importStar(require("./fs/file"));
+const file_1 = __importStar(require("./fsInternal/file"));
 exports.File = file_1.default;
-const fileSystem_1 = require("./fs/fileSystem");
+const fileSystem_1 = require("./fsInternal/fileSystem");
 Object.defineProperty(exports, "FileSystem", { enumerable: true, get: function () { return fileSystem_1.FileSystem; } });
 Object.defineProperty(exports, "NodeType", { enumerable: true, get: function () { return fileSystem_1.NodeType; } });
 const path_1 = require("./path");
 Object.defineProperty(exports, "Path", { enumerable: true, get: function () { return path_1.Path; } });
-const tableFile_1 = __importDefault(require("./fs/tableFile"));
-const tableInfo_1 = require("./fs/tableInfo");
+const tableFile_1 = __importDefault(require("./fsInternal/tableFile"));
+const tableInfo_1 = require("./fsInternal/tableInfo");
 const makeDir = (path, root) => {
     let base = root || directory_1.Directory.root;
     const comps = (0, path_1.pathToComponents)(path);

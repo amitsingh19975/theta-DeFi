@@ -1,5 +1,5 @@
 import { BlockDataType, MAX_BLOCK_SIZE, RowType } from "./edgeStore";
-import { AcceptableType } from "./fs/types";
+import { AcceptableType } from "./fsInternal/types";
 
 export type BlockAddress = string | null;
 

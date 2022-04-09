@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Path = exports.pathToComponents = exports.pathToComponentsHelper = exports.ComponentKind = void 0;
-const directory_1 = require("./fs/directory");
+const directory_1 = require("./fsInternal/directory");
 var ComponentKind;
 (function (ComponentKind) {
     ComponentKind[ComponentKind["RootDir"] = 0] = "RootDir";

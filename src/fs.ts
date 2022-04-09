@@ -1,10 +1,10 @@
-import { Directory, DirectorySerializeType, SerializationType } from './fs/directory';
-import File, { FileKind, FileSerializeType } from './fs/file';
-import { FileSystem, NodeType } from './fs/fileSystem';
+import { Directory, DirectorySerializeType, SerializationType } from './fsInternal/directory';
+import File, { FileKind, FileSerializeType } from './fsInternal/file';
+import { FileSystem, NodeType } from './fsInternal/fileSystem';
 import { BlockAddress } from './block';
 import { Path, pathToComponents, ComponentKind } from './path';
-import TableFile, { TableFileSerializeType } from './fs/tableFile';
-import { TableInfo } from './fs/tableInfo';
+import TableFile, { TableFileSerializeType } from './fsInternal/tableFile';
+import { TableInfo } from './fsInternal/tableInfo';
 
 export { Directory, File, FileSystem, NodeType, Path };
 
