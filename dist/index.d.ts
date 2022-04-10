@@ -33,18 +33,7 @@ declare module "solc/error" {
     };
     export const throwOrWarnSolError: (solErrorObj: ErrorObjectType) => void;
 }
-declare module "solcConfig" {
-    const _default: {
-        contracts: {
-            path: string;
-            cache: string;
-        };
-    };
-    export default _default;
-}
 declare module "solc/globContracts" {
-    import config from "solcConfig";
-    export { config };
     type SolFile = {
         path: string;
         content: string;
@@ -56,6 +45,7 @@ declare module "solc/compileSol" {
     export type userConfiguration = {
         contracts: {
             path: string;
+            cache: string;
         };
     };
     export type InSourcesType = {
@@ -262,7 +252,7 @@ declare module "solc/compileSol" {
         private readonly _runs;
         private _output;
         private _contracts;
-        constructor(_config?: userConfiguration, _compilerOutputSelection?: OutputSelectionType | undefined, _runs?: number);
+        constructor(_config: userConfiguration, _compilerOutputSelection?: OutputSelectionType | undefined, _runs?: number);
         get output(): SolOutputType;
         private _compileHelper;
         compile(): ContractNameType;
@@ -291,6 +281,7 @@ declare module "fsInternal/fileSystem" {
         protected removeSizeUsingNode(node: FileSystem | null): void;
         get name(): string;
         set name(newName: string);
+        get realName(): string;
         get parent(): Directory | null;
         set parent(newParent: Directory | null);
         get type(): NodeType;
@@ -804,6 +795,7 @@ declare module "block" {
     }
 }
 declare module "contract" {
+    import { ContractInfoType } from "solc/compileSol";
     import Web3 from 'web3';
     import { BlockAddress } from "block";
     import { Unit } from "web3-utils";
@@ -853,12 +845,13 @@ declare module "contract" {
         IsOwner: ContractMethodValueType;
     };
     export default class ShareableStorage {
+        static _compiledContract?: ContractInfoType;
         static _web?: Web3;
         static _chainId?: number;
         private _contract;
         private _transcationHash;
         private _address;
-        static init(chain: ChainType): void;
+        static init(chain: ChainType, compiledContract: ContractInfoType): void;
         get address(): BlockAddress;
         get transcationHash(): BlockAddress;
         constructor(address?: BlockAddress);
@@ -888,13 +881,20 @@ declare module "contract" {
         }): Promise<ShareableStorage | Error>;
     }
 }
+declare module "solcConfig" {
+    const _default: {
+        contracts: {
+            path: string;
+            cache: string;
+        };
+    };
+    export default _default;
+}
 declare module "app" { }
 declare module "solDriver" { }
 declare module "utils" {
-    export enum Loop {
-        BREAK = 0,
-        CONTINUE = 1
-    }
+    import { ContractInfoType } from "solc/compileSol";
+    export const getCompiledContract: (path: string) => Promise<ContractInfoType>;
 }
 declare module "commands/cd" {
     import { Directory } from "fs";

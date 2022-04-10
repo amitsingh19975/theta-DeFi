@@ -117,9 +117,8 @@ export default class TableFile extends File {
 
     getInfo() : TableMetadataType {
         const manager = this._manager;
-        if(!manager) throw new Error('[Table]: block manager is not initialized');
+        if(manager) this._height = manager.height;
 
-        this._height = manager.height;
 
         const fields = [] as FieldsType[];
 

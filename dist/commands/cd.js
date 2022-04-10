@@ -20,7 +20,7 @@ const cd = (path, root) => {
                 throw new Error('Internal Parsing error!');
             const child = base.getChild(el.text);
             if (!child)
-                throw new Error(`Directory['${base.name}'] does not have child named '${el.text}'`);
+                throw new Error(`Directory['${base.realName}'] does not have child named '${el.text}'`);
             if (child.isFile())
                 throw new Error(`Cannot 'cd' into file['${el.text}']; it only works on directory`);
             const dir = child.asDir();

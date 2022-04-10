@@ -75,6 +75,7 @@ class FileSystem {
     }
     get name() { return this._name; }
     set name(newName) { this._name = newName; }
+    get realName() { return this.isRoot() ? '/' : this.name; }
     get parent() { return this._parent ? this._parent.asDir() : null; }
     set parent(newParent) { this.setNewParent(newParent); }
     get type() { return this._type; }

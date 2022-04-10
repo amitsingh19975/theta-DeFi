@@ -116,9 +116,8 @@ class TableFile extends file_1.default {
     }
     getInfo() {
         const manager = this._manager;
-        if (!manager)
-            throw new Error('[Table]: block manager is not initialized');
-        this._height = manager.height;
+        if (manager)
+            this._height = manager.height;
         const fields = [];
         this._tableInfo.forEach(field => fields.push({
             name: field.name,
