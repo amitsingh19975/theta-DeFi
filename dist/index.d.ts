@@ -696,6 +696,12 @@ declare module "edgeStore" {
         suffix?: string;
     };
     export const makeURLFromArgs: ({ protocol, domain, port, suffix }: URLArgsType) => string;
+    export const makeEdgeStoreURL: () => string;
+    export const makeMarketURL: () => string;
+    export const URLS: {
+        edgeStoreURL: string;
+        marketURL: string;
+    };
     type EdgeResponeBaseType = {
         jsonrpc: string;
         id: string | number | boolean | null | undefined;

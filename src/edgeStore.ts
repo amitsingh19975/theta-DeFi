@@ -47,7 +47,7 @@ export const makeURLFromArgs = ({protocol, domain, port, suffix}: URLArgsType) =
     return protocol + domain + ( port ? ':' + port : '' ) + (suffix || '');
 };
 
-const edgeStoreURL = () => {
+export const makeEdgeStoreURL = () => {
     return makeURLFromArgs({
         suffix: '/rpc',
         protocol: EdgeStoreConfig.protocol,
@@ -56,13 +56,18 @@ const edgeStoreURL = () => {
     });
 }
 
-const storeURL = () => {
+export const makeMarketURL = () => {
     return makeURLFromArgs({
         protocol: EdgeStoreConfig.protocol,
         domain: EdgeStoreConfig.market.domain,
         port: EdgeStoreConfig.market.port || undefined
     });
 }
+
+export const URLS = {
+    edgeStoreURL: makeEdgeStoreURL(),
+    marketURL: makeMarketURL(),
+};
 
 enum EdgeStoreMethod{
     GetVersion  = 'edgestore.GetVersion',
@@ -176,9 +181,8 @@ const prepareData = (method: string, id: number | string, payload: StorageType |
 
 
 const postToEdgeStore = async (method: EdgeStoreMethod, id: number | string, params?: StorageType | Block ) => {
-    const URL = edgeStoreURL();
     const payload = prepareData(method, id, params || {});
-    return axios.post(URL, payload);
+    return axios.post(URLS.edgeStoreURL, payload);
 }
 
 export const getVersion = async (id: number | string, params?: StorageType | Block ) => postToEdgeStore(EdgeStoreMethod.GetVersion, id, params);
@@ -213,5 +217,5 @@ export type MarketAddTablePayloadType = BasicMarketPayloadType & {
 }
 
 export const market = async (method: MarketMethod, payload: MarketAddTablePayloadType) => {
-    return await axios.post(storeURL(), payload);
+    return await axios.post(URLS.marketURL, payload);
 }

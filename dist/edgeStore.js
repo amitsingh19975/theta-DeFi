@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.market = exports.MarketMethod = exports.getFile = exports.putFile = exports.getData = exports.putData = exports.getPeers = exports.getStatus = exports.getVersion = exports.validateAddress = exports.validateRow = exports.makeURLFromArgs = exports.initializeEdgeStore = exports.EdgeStoreConfig = exports.MAX_BLOCK_SIZE = void 0;
+exports.market = exports.MarketMethod = exports.getFile = exports.putFile = exports.getData = exports.putData = exports.getPeers = exports.getStatus = exports.getVersion = exports.validateAddress = exports.validateRow = exports.URLS = exports.makeMarketURL = exports.makeEdgeStoreURL = exports.makeURLFromArgs = exports.initializeEdgeStore = exports.EdgeStoreConfig = exports.MAX_BLOCK_SIZE = void 0;
 const axios_1 = __importDefault(require("axios"));
 const block_1 = require("./block");
 const config_json_1 = __importDefault(require("./config.json"));
@@ -42,7 +42,7 @@ const makeURLFromArgs = ({ protocol, domain, port, suffix }) => {
     return protocol + domain + (port ? ':' + port : '') + (suffix || '');
 };
 exports.makeURLFromArgs = makeURLFromArgs;
-const edgeStoreURL = () => {
+const makeEdgeStoreURL = () => {
     return (0, exports.makeURLFromArgs)({
         suffix: '/rpc',
         protocol: exports.EdgeStoreConfig.protocol,
@@ -50,12 +50,18 @@ const edgeStoreURL = () => {
         port: exports.EdgeStoreConfig.port || undefined
     });
 };
-const storeURL = () => {
+exports.makeEdgeStoreURL = makeEdgeStoreURL;
+const makeMarketURL = () => {
     return (0, exports.makeURLFromArgs)({
         protocol: exports.EdgeStoreConfig.protocol,
         domain: exports.EdgeStoreConfig.market.domain,
         port: exports.EdgeStoreConfig.market.port || undefined
     });
+};
+exports.makeMarketURL = makeMarketURL;
+exports.URLS = {
+    edgeStoreURL: (0, exports.makeEdgeStoreURL)(),
+    marketURL: (0, exports.makeMarketURL)(),
 };
 var EdgeStoreMethod;
 (function (EdgeStoreMethod) {
@@ -97,9 +103,8 @@ const prepareData = (method, id, payload) => {
     };
 };
 const postToEdgeStore = (method, id, params) => __awaiter(void 0, void 0, void 0, function* () {
-    const URL = edgeStoreURL();
     const payload = prepareData(method, id, params || {});
-    return axios_1.default.post(URL, payload);
+    return axios_1.default.post(exports.URLS.edgeStoreURL, payload);
 });
 const getVersion = (id, params) => __awaiter(void 0, void 0, void 0, function* () { return postToEdgeStore(EdgeStoreMethod.GetVersion, id, params); });
 exports.getVersion = getVersion;
@@ -121,7 +126,7 @@ var MarketMethod;
     MarketMethod["AddImage"] = "Market.AddImage";
 })(MarketMethod = exports.MarketMethod || (exports.MarketMethod = {}));
 const market = (method, payload) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield axios_1.default.post(storeURL(), payload);
+    return yield axios_1.default.post(exports.URLS.marketURL, payload);
 });
 exports.market = market;
 //# sourceMappingURL=edgeStore.js.map
