@@ -4,15 +4,9 @@ import { BlockAddress } from "./block";
 import { AbiItem, Unit } from "web3-utils";
 import { Contract, DeployOptions, SendOptions } from "web3-eth-contract";
 import AccountManager from "./accountManager";
-import { BasicMarketPayloadType, market, MarketMethod } from "./edgeStore";
+import { BasicMarketPayloadType, ChainType, market, MarketMethod } from "./edgeStore";
 import { TableMetadataType } from "./fsInternal/tableFile";
 import BN from "bn.js";
-
-export type ChainType = [string, number];
-
-export const ThetaMainnet: ChainType = ['https://eth-rpc-api.thetatoken.org/rpc', 361];
-export const ThetaTestnet: ChainType = ['https://eth-rpc-api-testnet.thetatoken.org/rpc', 365];
-export const ThetaLocalnet: ChainType = ['http://127.0.0.1:18888/rpc', 366]
 
 export const toHex = Web3.utils.toHex;
 
@@ -97,8 +91,8 @@ export default class ShareableStorage {
     private _address: BlockAddress = null;
 
     static init(chain: ChainType, compiledContract: ContractInfoType) : void {
-        this._chainId = chain[1];
-        this._web = new Web3(chain[0]);
+        this._chainId = chain.chainID;
+        this._web = new Web3(chain.url);
         this._compiledContract = compiledContract;
     }
     

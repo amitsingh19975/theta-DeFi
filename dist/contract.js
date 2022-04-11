@@ -12,13 +12,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ContractMethod = exports.CallMethod = exports.SendMethod = exports.AccessLevel = exports.fromWei = exports.toWei = exports.toHex = exports.ThetaLocalnet = exports.ThetaTestnet = exports.ThetaMainnet = void 0;
+exports.ContractMethod = exports.CallMethod = exports.SendMethod = exports.AccessLevel = exports.fromWei = exports.toWei = exports.toHex = void 0;
 const web3_1 = __importDefault(require("web3"));
 const accountManager_1 = __importDefault(require("./accountManager"));
 const edgeStore_1 = require("./edgeStore");
-exports.ThetaMainnet = ['https://eth-rpc-api.thetatoken.org/rpc', 361];
-exports.ThetaTestnet = ['https://eth-rpc-api-testnet.thetatoken.org/rpc', 365];
-exports.ThetaLocalnet = ['http://127.0.0.1:18888/rpc', 366];
 exports.toHex = web3_1.default.utils.toHex;
 const toWei = (val, unit) => {
     switch (typeof val) {
@@ -70,8 +67,8 @@ class ShareableStorage {
         this._contract = new ShareableStorage._web.eth.Contract(ShareableStorage._compiledContract.abi, address || undefined);
     }
     static init(chain, compiledContract) {
-        this._chainId = chain[1];
-        this._web = new web3_1.default(chain[0]);
+        this._chainId = chain.chainID;
+        this._web = new web3_1.default(chain.url);
         this._compiledContract = compiledContract;
     }
     get address() { return this._address; }

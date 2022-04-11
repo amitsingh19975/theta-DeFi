@@ -3,6 +3,26 @@ import { Block, BlockAddress, BlockType } from "./block";
 import ThetaConfig from './config.json'
 import { TableMetadataType } from "./fsInternal/tableFile";
 
+export type ChainType = {
+    url: string,
+    chainID: number,
+};
+
+export const ThetaMainnet: ChainType = {
+    url: 'https://eth-rpc-api.thetatoken.org/rpc',
+    chainID: 361,
+}
+
+export const ThetaTestnet: ChainType = {
+    url: 'https://eth-rpc-api-testnet.thetatoken.org/rpc',
+    chainID: 365,
+}
+
+export const ThetaLocalnet: ChainType = {
+    url: 'http://127.0.0.1:18888/rpc',
+    chainID: 366,
+}
+
 export const MAX_BLOCK_SIZE = 1024;
 
 export type EdgeStoreConfigType = {
@@ -67,6 +87,7 @@ export const makeMarketURL = () => {
 export const URLS = {
     edgeStoreURL: makeEdgeStoreURL(),
     marketURL: makeMarketURL(),
+    thetanet: ThetaLocalnet,
 };
 
 enum EdgeStoreMethod{

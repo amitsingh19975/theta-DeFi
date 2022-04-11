@@ -92,10 +92,11 @@
 // console.log(cts.evm.gasEstimates);
 
 import Web3 from 'web3';
-import ShareableStorage, { AccessLevel, ThetaLocalnet, toWei } from "./contract";
+import ShareableStorage, { AccessLevel, toWei } from "./contract";
 import AccountManager from "./accountManager";
 import fs from 'fs';
 import config from './solcConfig';
+import { URLS } from './edgeStore';
 
 const compiledContract = JSON.parse(fs.readFileSync(config.contracts.cache).toString());
 
@@ -127,7 +128,8 @@ const main = async () => {
     // await resolver.addRow({input: {name: 'A10', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
     // await resolver.commit();
     // file.currentBlocks.forEach(b => console.log(b.buffer));
-    ShareableStorage.init(ThetaLocalnet, compiledContract);
+    console.log(URLS.thetanet);
+    ShareableStorage.init(URLS.thetanet, compiledContract);
     const crt = new ShareableStorage('0x690b076B0442c445CbE7ba50F8245E60f6BE9dD1');
     // await crt.deploy({
     //     name: 'Testing',

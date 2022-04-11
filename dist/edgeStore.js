@@ -12,10 +12,22 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.market = exports.MarketMethod = exports.getFile = exports.putFile = exports.getData = exports.putData = exports.getPeers = exports.getStatus = exports.getVersion = exports.validateAddress = exports.validateRow = exports.URLS = exports.makeMarketURL = exports.makeEdgeStoreURL = exports.makeURLFromArgs = exports.initializeEdgeStore = exports.EdgeStoreConfig = exports.MAX_BLOCK_SIZE = void 0;
+exports.market = exports.MarketMethod = exports.getFile = exports.putFile = exports.getData = exports.putData = exports.getPeers = exports.getStatus = exports.getVersion = exports.validateAddress = exports.validateRow = exports.URLS = exports.makeMarketURL = exports.makeEdgeStoreURL = exports.makeURLFromArgs = exports.initializeEdgeStore = exports.EdgeStoreConfig = exports.MAX_BLOCK_SIZE = exports.ThetaLocalnet = exports.ThetaTestnet = exports.ThetaMainnet = void 0;
 const axios_1 = __importDefault(require("axios"));
 const block_1 = require("./block");
 const config_json_1 = __importDefault(require("./config.json"));
+exports.ThetaMainnet = {
+    url: 'https://eth-rpc-api.thetatoken.org/rpc',
+    chainID: 361,
+};
+exports.ThetaTestnet = {
+    url: 'https://eth-rpc-api-testnet.thetatoken.org/rpc',
+    chainID: 365,
+};
+exports.ThetaLocalnet = {
+    url: 'http://127.0.0.1:18888/rpc',
+    chainID: 366,
+};
 exports.MAX_BLOCK_SIZE = 1024;
 exports.EdgeStoreConfig = {
     protocol: ('protocol' in config_json_1.default ? config_json_1.default.protocol : 'https://'),
@@ -62,6 +74,7 @@ exports.makeMarketURL = makeMarketURL;
 exports.URLS = {
     edgeStoreURL: (0, exports.makeEdgeStoreURL)(),
     marketURL: (0, exports.makeMarketURL)(),
+    thetanet: exports.ThetaLocalnet,
 };
 var EdgeStoreMethod;
 (function (EdgeStoreMethod) {

@@ -661,6 +661,13 @@ declare module "fsInternal/tableFile" {
 declare module "edgeStore" {
     import { Block, BlockAddress, BlockType } from "block";
     import { TableMetadataType } from "fsInternal/tableFile";
+    export type ChainType = {
+        url: string;
+        chainID: number;
+    };
+    export const ThetaMainnet: ChainType;
+    export const ThetaTestnet: ChainType;
+    export const ThetaLocalnet: ChainType;
     export const MAX_BLOCK_SIZE = 1024;
     export type EdgeStoreConfigType = {
         protocol?: string;
@@ -701,6 +708,7 @@ declare module "edgeStore" {
     export const URLS: {
         edgeStoreURL: string;
         marketURL: string;
+        thetanet: ChainType;
     };
     type EdgeResponeBaseType = {
         jsonrpc: string;
@@ -829,13 +837,9 @@ declare module "contract" {
     import Web3 from 'web3';
     import { BlockAddress } from "block";
     import { Unit } from "web3-utils";
-    import { BasicMarketPayloadType } from "edgeStore";
+    import { BasicMarketPayloadType, ChainType } from "edgeStore";
     import { TableMetadataType } from "fsInternal/tableFile";
     import BN from "bn.js";
-    export type ChainType = [string, number];
-    export const ThetaMainnet: ChainType;
-    export const ThetaTestnet: ChainType;
-    export const ThetaLocalnet: ChainType;
     export const toHex: (value: string | number | BN) => string;
     export const toWei: (val: string | number | BN, unit?: Unit | undefined) => string | BN;
     export const fromWei: (val: string | number | BN, unit?: Unit | undefined) => string;

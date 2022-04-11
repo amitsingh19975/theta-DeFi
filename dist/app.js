@@ -2,29 +2,6 @@
 // // 4[3[2[1Int]!]]!
 // const temp = Int([true, false, true, false], 3);
 // console.log(temp.toString());
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -38,10 +15,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const contract_1 = __importStar(require("./contract"));
+const contract_1 = __importDefault(require("./contract"));
 const accountManager_1 = __importDefault(require("./accountManager"));
 const fs_1 = __importDefault(require("fs"));
 const solcConfig_1 = __importDefault(require("./solcConfig"));
+const edgeStore_1 = require("./edgeStore");
 const compiledContract = JSON.parse(fs_1.default.readFileSync(solcConfig_1.default.contracts.cache).toString());
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     // const Person = `
@@ -70,7 +48,8 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     // await resolver.addRow({input: {name: 'A10', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
     // await resolver.commit();
     // file.currentBlocks.forEach(b => console.log(b.buffer));
-    contract_1.default.init(contract_1.ThetaLocalnet, compiledContract);
+    console.log(edgeStore_1.URLS.thetanet);
+    contract_1.default.init(edgeStore_1.URLS.thetanet, compiledContract);
     const crt = new contract_1.default('0x690b076B0442c445CbE7ba50F8245E60f6BE9dD1');
     // await crt.deploy({
     //     name: 'Testing',
