@@ -15,7 +15,7 @@ export type EdgeStoreConfigType = {
     }
 }
 
-const EdgeStoreConfig = {
+export const EdgeStoreConfig = {
     protocol: ( 'protocol' in ThetaConfig ? ThetaConfig.protocol : 'https://' ),
     domain: ('domain' in ThetaConfig ? ThetaConfig.domain : 'localhost'),
     port: ('port' in ThetaConfig ? ThetaConfig.port : null),
@@ -33,14 +33,35 @@ export const initializeEdgeStore = (config?: EdgeStoreConfigType) => {
         domain: config?.market?.domain || EdgeStoreConfig.market.domain,
         port: config?.market?.port || EdgeStoreConfig.market.port
     };
+    return EdgeStoreConfig;
 }
 
-const url = () => {
-    return EdgeStoreConfig.protocol + EdgeStoreConfig.domain + ( EdgeStoreConfig.port ? ':' + EdgeStoreConfig.port : '' ) + '/rpc';
+type URLArgsType = {
+    protocol: string,
+    domain: string,
+    port?: number,
+    suffix?: string
+};
+
+export const makeURLFromArgs = ({protocol, domain, port, suffix}: URLArgsType) => {
+    return protocol + domain + ( port ? ':' + port : '' ) + (suffix || '');
+};
+
+const edgeStoreURL = () => {
+    return makeURLFromArgs({
+        suffix: '/rpc',
+        protocol: EdgeStoreConfig.protocol,
+        domain: EdgeStoreConfig.domain,
+        port: EdgeStoreConfig.port || undefined
+    });
 }
 
 const storeURL = () => {
-    return EdgeStoreConfig.protocol + EdgeStoreConfig.market.domain + ( EdgeStoreConfig.port ? ':' + EdgeStoreConfig.port : '' );
+    return makeURLFromArgs({
+        protocol: EdgeStoreConfig.protocol,
+        domain: EdgeStoreConfig.market.domain,
+        port: EdgeStoreConfig.market.port || undefined
+    });
 }
 
 enum EdgeStoreMethod{
@@ -155,7 +176,7 @@ const prepareData = (method: string, id: number | string, payload: StorageType |
 
 
 const postToEdgeStore = async (method: EdgeStoreMethod, id: number | string, params?: StorageType | Block ) => {
-    const URL = url();
+    const URL = edgeStoreURL();
     const payload = prepareData(method, id, params || {});
     return axios.post(URL, payload);
 }

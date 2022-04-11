@@ -671,7 +671,31 @@ declare module "edgeStore" {
             port?: number;
         };
     };
-    export const initializeEdgeStore: (config?: EdgeStoreConfigType | undefined) => void;
+    export const EdgeStoreConfig: {
+        protocol: string;
+        domain: string;
+        port: number | null;
+        market: {
+            domain: string;
+            port: number;
+        };
+    };
+    export const initializeEdgeStore: (config?: EdgeStoreConfigType | undefined) => {
+        protocol: string;
+        domain: string;
+        port: number | null;
+        market: {
+            domain: string;
+            port: number;
+        };
+    };
+    type URLArgsType = {
+        protocol: string;
+        domain: string;
+        port?: number;
+        suffix?: string;
+    };
+    export const makeURLFromArgs: ({ protocol, domain, port, suffix }: URLArgsType) => string;
     type EdgeResponeBaseType = {
         jsonrpc: string;
         id: string | number | boolean | null | undefined;
