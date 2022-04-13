@@ -90,6 +90,14 @@ export const URLS = {
     thetanet: ThetaLocalnet,
 };
 
+export const LOCALSERVER_BASE_URL = '';
+export const MAIN_URL = {
+    edgeStore: 'edgestore',
+    thetanet: 'thetanet',
+};
+
+const concatURL = (path: string) => `${LOCALSERVER_BASE_URL}/${path}`;
+
 enum EdgeStoreMethod{
     GetVersion  = 'edgestore.GetVersion',
     GetStatus   = 'edgestore.GetStatus',
@@ -203,12 +211,11 @@ const prepareData = (method: string, id: number | string, payload: StorageType |
 
 const postToEdgeStore = async (method: EdgeStoreMethod, id: number | string, params?: StorageType | Block ) => {
     const payload = prepareData(method, id, params || {});
-    if (window['IS_LOCAL']){
-        return axios.post(URLS.edgeStoreURL, payload);
-    }else{
-        const data = { payload, url: URLS.edgeStoreURL };
-        return axios.post('/edgestore', data);
+    let url = URLS.edgeStoreURL;
+    if (!window['IS_LOCAL']){
+        url = concatURL(MAIN_URL.edgeStore);
     }
+    return axios.post(url, payload);
 }
 
 export const getVersion = async (id: number | string, params?: StorageType | Block ) => postToEdgeStore(EdgeStoreMethod.GetVersion, id, params);
