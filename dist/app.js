@@ -16,7 +16,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const contract_1 = __importDefault(require("./contract"));
-const accountManager_1 = __importDefault(require("./accountManager"));
 const fs_1 = __importDefault(require("fs"));
 const solcConfig_1 = __importDefault(require("./solcConfig"));
 const edgeStore_1 = require("./edgeStore");
@@ -48,36 +47,39 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     // await resolver.addRow({input: {name: 'A10', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
     // await resolver.commit();
     // file.currentBlocks.forEach(b => console.log(b.buffer));
-    console.log(edgeStore_1.URLS.thetanet);
     contract_1.default.init(edgeStore_1.URLS.thetanet, compiledContract);
-    const crt = new contract_1.default('0x690b076B0442c445CbE7ba50F8245E60f6BE9dD1');
-    // await crt.deploy({
-    //     name: 'Testing',
-    //     blockAddress: '0x123123adfa1',
-    //     rPrice: toWei(2, 'gwei'),
-    //     rwPrice: toWei(3, 'gwei')
-    // });
-    accountManager_1.default.currentIdx = 1;
-    const show = () => __awaiter(void 0, void 0, void 0, function* () {
-        console.log('-------------------------');
-        console.log('Address: ' + crt.address);
-        console.log('Name: ' + (yield crt.name()));
-        console.log('Symbol: ' + (yield crt.symbol()));
-        console.log('Decimals: ' + (yield crt.decimals()));
-        console.log('MinAccessLevel: ' + (yield crt.minAccessLevel()));
-        console.log('MaxAccessLevel: ' + (yield crt.maxAccessLevel()));
-        console.log('MyAccessLevel: ' + (yield crt.myAccessLevel()));
-        console.log('HasNoPerm: ' + (yield crt.hasNoPerm()));
-        console.log('HasReadPerm: ' + (yield crt.hasReadPerm()));
-        console.log('HasReadWritePerm: ' + (yield crt.hasReadWritePerm()));
-        console.log('GetBlockAddress: ' + (yield crt.getBlockAddress()));
-        console.log('GetPrices: ' + (yield crt.getPrices()));
-        console.log('-------------------------');
-    });
+    const web = contract_1.default._web;
+    if (!web)
+        return;
+    console.log(yield web.eth.net.isListening());
+    // const crt = new ShareableStorage('0x690b076B0442c445CbE7ba50F8245E60f6BE9dD1');
+    // // await crt.deploy({
+    // //     name: 'Testing',
+    // //     blockAddress: '0x123123adfa1',
+    // //     rPrice: toWei(2, 'gwei'),
+    // //     rwPrice: toWei(3, 'gwei')
+    // // });
+    // AccountManager.currentIdx = 1;
+    // const show = async () => {
+    //     console.log( '-------------------------' );
+    //     console.log( 'Address: ' + crt.address);
+    //     console.log( 'Name: ' + await crt.name());
+    //     console.log( 'Symbol: ' + await crt.symbol());
+    //     console.log( 'Decimals: ' + await crt.decimals());
+    //     console.log( 'MinAccessLevel: ' + await crt.minAccessLevel());
+    //     console.log( 'MaxAccessLevel: ' + await crt.maxAccessLevel());
+    //     console.log( 'MyAccessLevel: ' + await crt.myAccessLevel());
+    //     console.log( 'HasNoPerm: ' + await crt.hasNoPerm());
+    //     console.log( 'HasReadPerm: ' + await crt.hasReadPerm());
+    //     console.log( 'HasReadWritePerm: ' + await crt.hasReadWritePerm());
+    //     console.log( 'GetBlockAddress: ' + await crt.getBlockAddress());
+    //     console.log( 'GetPrices: ' + await crt.getPrices());
+    //     console.log( '-------------------------' );
+    // }
     // show();
     // await crt.buy(AccessLevel.RW, toWei(1, 'Gwei'));
     // await crt.updateBlockAddress('0x123123');
-    show();
+    // show();
 });
 main();
 // Store.init().then(main);

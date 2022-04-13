@@ -203,7 +203,12 @@ const prepareData = (method: string, id: number | string, payload: StorageType |
 
 const postToEdgeStore = async (method: EdgeStoreMethod, id: number | string, params?: StorageType | Block ) => {
     const payload = prepareData(method, id, params || {});
-    return axios.post(URLS.edgeStoreURL, payload);
+    if (window['IS_LOCAL']){
+        return axios.post(URLS.edgeStoreURL, payload);
+    }else{
+        const data = { payload, url: URLS.edgeStoreURL };
+        return axios.post('/edgestore', data);
+    }
 }
 
 export const getVersion = async (id: number | string, params?: StorageType | Block ) => postToEdgeStore(EdgeStoreMethod.GetVersion, id, params);

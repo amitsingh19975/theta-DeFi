@@ -1,3 +1,4 @@
+window['IS_LOCAL'] = false;
 // // 4[3[2[1Int]!]]!
 // const temp = Int([true, false, true, false], 3);
 // console.log(temp.toString());
@@ -128,33 +129,35 @@ const main = async () => {
     // await resolver.addRow({input: {name: 'A10', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
     // await resolver.commit();
     // file.currentBlocks.forEach(b => console.log(b.buffer));
-    console.log(URLS.thetanet);
     ShareableStorage.init(URLS.thetanet, compiledContract);
-    const crt = new ShareableStorage('0x690b076B0442c445CbE7ba50F8245E60f6BE9dD1');
-    // await crt.deploy({
-    //     name: 'Testing',
-    //     blockAddress: '0x123123adfa1',
-    //     rPrice: toWei(2, 'gwei'),
-    //     rwPrice: toWei(3, 'gwei')
-    // });
+    const web = ShareableStorage._web;
+    if (!web) return;
+    console.log(await web.eth.net.isListening());
+    // const crt = new ShareableStorage('0x690b076B0442c445CbE7ba50F8245E60f6BE9dD1');
+    // // await crt.deploy({
+    // //     name: 'Testing',
+    // //     blockAddress: '0x123123adfa1',
+    // //     rPrice: toWei(2, 'gwei'),
+    // //     rwPrice: toWei(3, 'gwei')
+    // // });
 
-    AccountManager.currentIdx = 1;
-    const show = async () => {
-        console.log( '-------------------------' );
-        console.log( 'Address: ' + crt.address);
-        console.log( 'Name: ' + await crt.name());
-        console.log( 'Symbol: ' + await crt.symbol());
-        console.log( 'Decimals: ' + await crt.decimals());
-        console.log( 'MinAccessLevel: ' + await crt.minAccessLevel());
-        console.log( 'MaxAccessLevel: ' + await crt.maxAccessLevel());
-        console.log( 'MyAccessLevel: ' + await crt.myAccessLevel());
-        console.log( 'HasNoPerm: ' + await crt.hasNoPerm());
-        console.log( 'HasReadPerm: ' + await crt.hasReadPerm());
-        console.log( 'HasReadWritePerm: ' + await crt.hasReadWritePerm());
-        console.log( 'GetBlockAddress: ' + await crt.getBlockAddress());
-        console.log( 'GetPrices: ' + await crt.getPrices());
-        console.log( '-------------------------' );
-    }
+    // AccountManager.currentIdx = 1;
+    // const show = async () => {
+    //     console.log( '-------------------------' );
+    //     console.log( 'Address: ' + crt.address);
+    //     console.log( 'Name: ' + await crt.name());
+    //     console.log( 'Symbol: ' + await crt.symbol());
+    //     console.log( 'Decimals: ' + await crt.decimals());
+    //     console.log( 'MinAccessLevel: ' + await crt.minAccessLevel());
+    //     console.log( 'MaxAccessLevel: ' + await crt.maxAccessLevel());
+    //     console.log( 'MyAccessLevel: ' + await crt.myAccessLevel());
+    //     console.log( 'HasNoPerm: ' + await crt.hasNoPerm());
+    //     console.log( 'HasReadPerm: ' + await crt.hasReadPerm());
+    //     console.log( 'HasReadWritePerm: ' + await crt.hasReadWritePerm());
+    //     console.log( 'GetBlockAddress: ' + await crt.getBlockAddress());
+    //     console.log( 'GetPrices: ' + await crt.getPrices());
+    //     console.log( '-------------------------' );
+    // }
 
     // show();
 
@@ -162,7 +165,7 @@ const main = async () => {
 
     // await crt.updateBlockAddress('0x123123');
 
-    show();
+    // show();
 
 }
 
