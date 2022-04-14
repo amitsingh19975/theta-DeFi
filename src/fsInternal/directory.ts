@@ -9,6 +9,7 @@ export type DirectorySerializeType = {
     type: NodeType,
     children: SerializationType[],
     size: number,
+    isRoot: boolean,
 }
 
 export class Directory extends FileSystem {
@@ -98,6 +99,7 @@ export class Directory extends FileSystem {
             type: NodeType.Dir,
             children: this.children.map(el => el.serialize()),
             size: this.size,
+            isRoot: this.isRoot(),
         }
     }
 }

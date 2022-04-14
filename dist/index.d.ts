@@ -381,6 +381,7 @@ declare module "fsInternal/directory" {
         type: NodeType;
         children: SerializationType[];
         size: number;
+        isRoot: boolean;
     };
     export class Directory extends FileSystem {
         #private;
@@ -710,6 +711,11 @@ declare module "edgeStore" {
         marketURL: string;
         thetanet: ChainType;
     };
+    export const LOCALSERVER_BASE_URL = "";
+    export const MAIN_URL: {
+        edgeStore: string;
+        thetanet: string;
+    };
     type EdgeResponeBaseType = {
         jsonrpc: string;
         id: string | number | boolean | null | undefined;
@@ -774,6 +780,9 @@ declare module "edgeStore" {
     };
     export const validateRow: (row: BlockDataType) => boolean;
     export const validateAddress: (row: BlockDataType) => boolean;
+    export type WindowType = Window & typeof globalThis & {
+        'IS_LOCAL'?: boolean;
+    };
     export const getVersion: (id: number | string, params?: Block | StorageType | undefined) => Promise<import("axios").AxiosResponse<any, any>>;
     export const getStatus: (id: number | string, params?: Block | StorageType | undefined) => Promise<import("axios").AxiosResponse<any, any>>;
     export const getPeers: (id: number | string, params?: Block | StorageType | undefined) => Promise<import("axios").AxiosResponse<any, any>>;

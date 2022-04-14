@@ -1,7 +1,4 @@
 "use strict";
-// // 4[3[2[1Int]!]]!
-// const temp = Int([true, false, true, false], 3);
-// console.log(temp.toString());
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -15,6 +12,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const win = globalThis;
+win['IS_LOCAL'] = false;
 const contract_1 = __importDefault(require("./contract"));
 const fs_1 = __importDefault(require("fs"));
 const solcConfig_1 = __importDefault(require("./solcConfig"));

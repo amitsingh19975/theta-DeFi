@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.market = exports.MarketMethod = exports.getFile = exports.putFile = exports.getData = exports.putData = exports.getPeers = exports.getStatus = exports.getVersion = exports.validateAddress = exports.validateRow = exports.URLS = exports.makeMarketURL = exports.makeEdgeStoreURL = exports.makeURLFromArgs = exports.initializeEdgeStore = exports.EdgeStoreConfig = exports.MAX_BLOCK_SIZE = exports.ThetaLocalnet = exports.ThetaTestnet = exports.ThetaMainnet = void 0;
+exports.market = exports.MarketMethod = exports.getFile = exports.putFile = exports.getData = exports.putData = exports.getPeers = exports.getStatus = exports.getVersion = exports.validateAddress = exports.validateRow = exports.MAIN_URL = exports.LOCALSERVER_BASE_URL = exports.URLS = exports.makeMarketURL = exports.makeEdgeStoreURL = exports.makeURLFromArgs = exports.initializeEdgeStore = exports.EdgeStoreConfig = exports.MAX_BLOCK_SIZE = exports.ThetaLocalnet = exports.ThetaTestnet = exports.ThetaMainnet = void 0;
 const axios_1 = __importDefault(require("axios"));
 const block_1 = require("./block");
 const config_json_1 = __importDefault(require("./config.json"));
@@ -76,6 +76,12 @@ exports.URLS = {
     marketURL: (0, exports.makeMarketURL)(),
     thetanet: exports.ThetaLocalnet,
 };
+exports.LOCALSERVER_BASE_URL = '';
+exports.MAIN_URL = {
+    edgeStore: 'edgestore',
+    thetanet: 'thetanet',
+};
+const concatURL = (path) => `${exports.LOCALSERVER_BASE_URL}/${path}`;
 var EdgeStoreMethod;
 (function (EdgeStoreMethod) {
     EdgeStoreMethod["GetVersion"] = "edgestore.GetVersion";
@@ -117,7 +123,12 @@ const prepareData = (method, id, payload) => {
 };
 const postToEdgeStore = (method, id, params) => __awaiter(void 0, void 0, void 0, function* () {
     const payload = prepareData(method, id, params || {});
-    return axios_1.default.post(exports.URLS.edgeStoreURL, payload);
+    let url = exports.URLS.edgeStoreURL;
+    const win = globalThis;
+    if (!win.IS_LOCAL) {
+        url = concatURL(exports.MAIN_URL.edgeStore);
+    }
+    return axios_1.default.post(url, payload);
 });
 const getVersion = (id, params) => __awaiter(void 0, void 0, void 0, function* () { return postToEdgeStore(EdgeStoreMethod.GetVersion, id, params); });
 exports.getVersion = getVersion;

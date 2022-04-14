@@ -78,6 +78,7 @@ class Directory extends fileSystem_1.FileSystem {
             type: fileSystem_1.NodeType.Dir,
             children: this.children.map(el => el.serialize()),
             size: this.size,
+            isRoot: this.isRoot(),
         };
     }
 }

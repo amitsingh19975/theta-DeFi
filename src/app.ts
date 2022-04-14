@@ -1,4 +1,6 @@
-window['IS_LOCAL'] = false;
+const win = globalThis as unknown as WindowType;
+
+win['IS_LOCAL'] = false;
 // // 4[3[2[1Int]!]]!
 // const temp = Int([true, false, true, false], 3);
 // console.log(temp.toString());
@@ -97,7 +99,7 @@ import ShareableStorage, { AccessLevel, toWei } from "./contract";
 import AccountManager from "./accountManager";
 import fs from 'fs';
 import config from './solcConfig';
-import { URLS } from './edgeStore';
+import { URLS, WindowType } from './edgeStore';
 
 const compiledContract = JSON.parse(fs.readFileSync(config.contracts.cache).toString());
 

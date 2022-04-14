@@ -82,7 +82,9 @@ const serializeFileSystem = (root) => {
 };
 exports.serializeFileSystem = serializeFileSystem;
 const deserializeDir = (dir) => {
-    const temp = directory_1.Directory.make(null, dir.name);
+    let temp = directory_1.Directory.root;
+    if (!dir.isRoot)
+        temp = directory_1.Directory.make(null, dir.name);
     dir.children.forEach(el => temp.children.push((0, exports.deserializeFileSystem)(el)));
     temp.setSizeWithoutUpdatingParent(dir.size);
     return temp;

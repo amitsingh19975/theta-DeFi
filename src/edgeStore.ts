@@ -208,11 +208,13 @@ const prepareData = (method: string, id: number | string, payload: StorageType |
     }
 }
 
+export type WindowType = Window & typeof globalThis & { 'IS_LOCAL'?: boolean };
 
 const postToEdgeStore = async (method: EdgeStoreMethod, id: number | string, params?: StorageType | Block ) => {
     const payload = prepareData(method, id, params || {});
     let url = URLS.edgeStoreURL;
-    if (!window['IS_LOCAL']){
+    const win = globalThis as unknown as WindowType;
+    if (!win.IS_LOCAL){
         url = concatURL(MAIN_URL.edgeStore);
     }
     return axios.post(url, payload);
