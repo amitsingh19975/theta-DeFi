@@ -144,9 +144,6 @@ const main = async () => {
     // //     rPrice: toWei(2, 'gwei'),
     // //     rwPrice: toWei(3, 'gwei')
     // // });
-    const str = {"name":"","parent":"","type":2,"children":[{"name":"asdf a","parent":"","type":2,"children":[],"size":0,"isRoot":false}],"size":0,"isRoot":true};
-    deserializeFileSystem(str);
-    console.log(util.inspect(Directory.root, {showHidden: false, depth: null, colors: true}));
 
     // AccountManager.currentIdx = 1;
     // const show = async () => {

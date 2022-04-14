@@ -215,6 +215,7 @@ export class TableInfo{
 
     serialize() : TableInfoInterface {
         return {
+            tableName: this.tableName,
             fields: this.fields,
             source: this.source,
             description: this.description,

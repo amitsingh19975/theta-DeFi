@@ -178,6 +178,7 @@ class TableInfo {
     }
     serialize() {
         return {
+            tableName: this.tableName,
             fields: this.fields,
             source: this.source,
             description: this.description,
