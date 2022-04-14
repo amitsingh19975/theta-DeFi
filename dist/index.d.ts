@@ -594,9 +594,9 @@ declare module "fs" {
     export const makeDir: (path: string | string[], root?: Directory | undefined) => Directory | null;
     export const makeTable: (name: string, fileInfoOrGraphqlSourceCode?: string | undefined, blockAddress?: BlockAddress | undefined, size?: number | undefined, root?: Directory | undefined) => TableFile;
     export const serializeFileSystem: (root?: Directory | undefined) => string;
-    export const deserializeDir: (dir: DirectorySerializeType) => Directory;
-    export const deserializeFile: (file: FileSerializeType) => File;
-    export const deserializeFileSystem: (serializedObject: string | SerializationType) => Directory;
+    export const deserializeDir: (dir: DirectorySerializeType, parent?: Directory | undefined) => void;
+    export const deserializeFile: (file: FileSerializeType, parent: Directory) => void;
+    export const deserializeFileSystem: (serializedObject: string | SerializationType, parent?: Directory | undefined) => Directory;
     export const getDirOrFile: (path: string | string[], root?: Directory | undefined) => FileSystem | null;
     export const getDir: (path: string | string[], root?: Directory | undefined) => Directory | null;
     export const getFile: (path: string | string[], root?: Directory | undefined) => File | null;

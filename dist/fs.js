@@ -81,34 +81,38 @@ const serializeFileSystem = (root) => {
     return JSON.stringify(node.serialize());
 };
 exports.serializeFileSystem = serializeFileSystem;
-const deserializeDir = (dir) => {
-    let temp = directory_1.Directory.root;
-    if (!dir.isRoot)
-        temp = directory_1.Directory.make(null, dir.name);
-    dir.children.forEach(el => temp.children.push((0, exports.deserializeFileSystem)(el)));
-    temp.setSizeWithoutUpdatingParent(dir.size);
-    return temp;
+const deserializeDir = (dir, parent) => {
+    const ch = dir.children;
+    const root = parent || directory_1.Directory.root;
+    let node = directory_1.Directory.root;
+    if (!dir.isRoot) {
+        node = directory_1.Directory.make(null, dir.name);
+        root.addChild(node);
+    }
+    ch.forEach(el => (0, exports.deserializeFileSystem)(el, node));
+    node.setSizeWithoutUpdatingParent(dir.size);
 };
 exports.deserializeDir = deserializeDir;
-const deserializeFile = (file) => {
-    let temp;
+const deserializeFile = (file, parent) => {
     if (file.kind === file_1.FileKind.Table) {
         const info = tableInfo_1.TableInfo.deserialize(file.serializedChild.tableInfo);
-        temp = tableFile_1.default.make(null, file.name, info, file.blockAddress, file.size);
+        const temp = tableFile_1.default.make(null, file.name, info, file.blockAddress, file.size);
+        parent.addChild(temp);
     }
     else {
         throw new Error('[File]: unkown file kind found!');
     }
-    return temp;
 };
 exports.deserializeFile = deserializeFile;
-const deserializeFileSystem = (serializedObject) => {
+const deserializeFileSystem = (serializedObject, parent) => {
     const data = (typeof serializedObject === 'string' ? JSON.parse(serializedObject) : serializedObject);
+    const node = parent || directory_1.Directory.root;
     if (data.type === fileSystem_1.NodeType.Dir) {
-        (0, exports.deserializeDir)(data);
+        const temp = data;
+        (0, exports.deserializeDir)(temp, node);
     }
     else if (data.type === fileSystem_1.NodeType.File) {
-        (0, exports.deserializeFile)(data);
+        (0, exports.deserializeFile)(data, node);
     }
     return directory_1.Directory.root;
 };

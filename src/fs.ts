@@ -49,32 +49,38 @@ export const serializeFileSystem = (root?: Directory) => {
     return JSON.stringify(node.serialize());
 }
 
-export const deserializeDir = (dir: DirectorySerializeType) => {
-    let temp = Directory.root;
-    if (!dir.isRoot) temp = Directory.make(null, dir.name);
-    dir.children.forEach(el => temp.children.push(deserializeFileSystem(el)));
-    temp.setSizeWithoutUpdatingParent(dir.size);
-    return temp;
+export const deserializeDir = (dir: DirectorySerializeType, parent?: Directory) => {
+    const ch = dir.children;
+    const root = parent || Directory.root;
+    let node = Directory.root;
+    if (!dir.isRoot) {
+        node = Directory.make(null, dir.name);
+        root.addChild(node);
+    }
+    ch.forEach(el => deserializeFileSystem(el, node));
+    node.setSizeWithoutUpdatingParent(dir.size);
+    
 }
 
-export const deserializeFile = (file: FileSerializeType) => {
-    let temp: File;
+export const deserializeFile = (file: FileSerializeType, parent: Directory) => {
     if(file.kind === FileKind.Table){
         const info = TableInfo.deserialize((file.serializedChild as TableFileSerializeType).tableInfo);
-        temp = TableFile.make(null, file.name, info, file.blockAddress, file.size);
+        const temp = TableFile.make(null, file.name, info, file.blockAddress, file.size);
+        parent.addChild(temp);
     }else {
         throw new Error('[File]: unkown file kind found!');
     }
-    return temp;
 }
 
-export const deserializeFileSystem = (serializedObject: string | SerializationType) => {
+export const deserializeFileSystem = (serializedObject: string | SerializationType, parent?: Directory) => {
     const data = (typeof serializedObject === 'string' ? JSON.parse(serializedObject) as SerializationType : serializedObject);
-    
+    const node = parent || Directory.root;
+
     if(data.type === NodeType.Dir){
-        deserializeDir(data as DirectorySerializeType);
+        const temp = data as DirectorySerializeType;
+        deserializeDir(temp, node);
     }else if(data.type === NodeType.File){
-        deserializeFile(data as FileSerializeType);
+        deserializeFile(data as FileSerializeType, node);
     }
 
     return Directory.root;

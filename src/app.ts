@@ -94,14 +94,16 @@ win['IS_LOCAL'] = false;
 // const cts = contracts.ShareableStorage;
 // console.log(cts.evm.gasEstimates);
 
+import util from 'util';
 import Web3 from 'web3';
 import ShareableStorage, { AccessLevel, toWei } from "./contract";
 import AccountManager from "./accountManager";
 import fs from 'fs';
 import config from './solcConfig';
-import { URLS, WindowType } from './edgeStore';
+import { WindowType } from './edgeStore';
+import { deserializeFileSystem, Directory } from './fs';
 
-const compiledContract = JSON.parse(fs.readFileSync(config.contracts.cache).toString());
+// const compiledContract = JSON.parse(fs.readFileSync(config.contracts.cache).toString());
 
 const main = async () => {
     // const Person = `
@@ -131,10 +133,10 @@ const main = async () => {
     // await resolver.addRow({input: {name: 'A10', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
     // await resolver.commit();
     // file.currentBlocks.forEach(b => console.log(b.buffer));
-    ShareableStorage.init(URLS.thetanet, compiledContract);
-    const web = ShareableStorage._web;
-    if (!web) return;
-    console.log(await web.eth.net.isListening());
+    // ShareableStorage.init(URLS.thetanet, compiledContract);
+    // const web = ShareableStorage._web;
+    // if (!web) return;
+    // console.log(await web.eth.net.isListening());
     // const crt = new ShareableStorage('0x690b076B0442c445CbE7ba50F8245E60f6BE9dD1');
     // // await crt.deploy({
     // //     name: 'Testing',
@@ -142,6 +144,9 @@ const main = async () => {
     // //     rPrice: toWei(2, 'gwei'),
     // //     rwPrice: toWei(3, 'gwei')
     // // });
+    const str = {"name":"","parent":"","type":2,"children":[{"name":"asdf a","parent":"","type":2,"children":[],"size":0,"isRoot":false}],"size":0,"isRoot":true};
+    deserializeFileSystem(str);
+    console.log(util.inspect(Directory.root, {showHidden: false, depth: null, colors: true}));
 
     // AccountManager.currentIdx = 1;
     // const show = async () => {
