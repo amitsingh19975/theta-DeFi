@@ -47,7 +47,7 @@ const mapBlocks = (blocks) => {
 };
 const buildArgsFromFields = (fileInfo, sep = ', ') => {
     const args = [];
-    fileInfo.forEach(el => args.push(el.name + ': ' + el.type.toString()));
+    fileInfo.forEach(el => args.push(el.name + ': ' + el.type.toStr()));
     return args.join(sep);
 };
 exports.buildArgsFromFields = buildArgsFromFields;

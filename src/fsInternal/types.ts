@@ -54,7 +54,7 @@ export class BasicType{
         return '[' + this.toStringHelper(depth - 1) + ']' + temp;
     }
 
-    toString() : string {
+    toStr() : string {
         return this.toStringHelper(this._arrayDepth);
     }
     

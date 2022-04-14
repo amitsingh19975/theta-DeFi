@@ -420,7 +420,7 @@ declare module "fsInternal/types" {
         get isBool(): boolean;
         private typeToGraphQLType;
         private toStringHelper;
-        toString(): string;
+        toStr(): string;
         canBeNull(depth?: number): boolean;
         private checkConstraintsHelper;
         private checkConstraintsArray;

@@ -43,7 +43,7 @@ const mapBlocks = (blocks: Block[]) => {
 
 export const buildArgsFromFields = (fileInfo: TableInfo, sep = ', ') => {
     const args = [] as string[];
-    fileInfo.forEach(el => args.push(el.name + ': ' + el.type.toString()));
+    fileInfo.forEach(el => args.push(el.name + ': ' + el.type.toStr()));
     return args.join(sep);
 }
 

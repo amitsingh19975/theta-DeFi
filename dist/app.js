@@ -8,22 +8,29 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const win = globalThis;
 win['IS_LOCAL'] = false;
-// const compiledContract = JSON.parse(fs.readFileSync(config.contracts.cache).toString());
+const contract_1 = __importDefault(require("./contract"));
+const fs_1 = __importDefault(require("fs"));
+const solcConfig_1 = __importDefault(require("./solcConfig"));
+const edgeStore_1 = require("./edgeStore");
+const fs_2 = require("./fs");
+const compiledContract = JSON.parse(fs_1.default.readFileSync(solcConfig_1.default.contracts.cache).toString());
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
-    // const Person = `
-    // type Person {
-    //     name: String!
-    //     phone: Int!
-    //     salary: Float!
-    //     city: String!
-    //     country: String!
-    // }
-    // `;
-    // const file = makeTable('Person', Person);
-    // await file.init();
+    const Person = `
+    type Person {
+        name: String!
+        phone: Int!
+      }
+    `;
+    contract_1.default.init(edgeStore_1.URLS.thetanet, compiledContract);
+    const file = (0, fs_2.makeTable)('Person', Person);
+    yield file.init();
+    console.log(file.makeGraphQLSchema());
     // console.log(Directory.root.serialize());
     // const resolver = file.makeGraphQLResolver();
     // await resolver.addRow({input: {name: 'A1', phone: 123123, salary: 123.3, city: 'Lucknow', country: 'India'}});

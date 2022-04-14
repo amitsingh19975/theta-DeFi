@@ -48,7 +48,7 @@ class BasicType {
         // console.log(depth);
         return '[' + this.toStringHelper(depth - 1) + ']' + temp;
     }
-    toString() {
+    toStr() {
         return this.toStringHelper(this._arrayDepth);
     }
     canBeNull(depth) { return this._canBeNull[depth || 0]; }

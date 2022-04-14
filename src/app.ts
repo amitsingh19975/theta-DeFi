@@ -100,24 +100,23 @@ import ShareableStorage, { AccessLevel, toWei } from "./contract";
 import AccountManager from "./accountManager";
 import fs from 'fs';
 import config from './solcConfig';
-import { WindowType } from './edgeStore';
-import { deserializeFileSystem, Directory } from './fs';
+import { URLS, WindowType } from './edgeStore';
+import { deserializeFileSystem, Directory, makeTable } from './fs';
 
-// const compiledContract = JSON.parse(fs.readFileSync(config.contracts.cache).toString());
+const compiledContract = JSON.parse(fs.readFileSync(config.contracts.cache).toString());
 
 const main = async () => {
-    // const Person = `
-    // type Person {
-    //     name: String!
-    //     phone: Int!
-    //     salary: Float!
-    //     city: String!
-    //     country: String!
-    // }
-    // `;
+    const Person = `
+    type Person {
+        name: String!
+        phone: Int!
+      }
+    `;
     
-    // const file = makeTable('Person', Person);
-    // await file.init();
+    ShareableStorage.init(URLS.thetanet, compiledContract);
+    const file = makeTable('Person', Person);
+    await file.init();
+    console.log(file.makeGraphQLSchema());
     // console.log(Directory.root.serialize());
     // const resolver = file.makeGraphQLResolver();
     // await resolver.addRow({input: {name: 'A1', phone: 123123, salary: 123.3, city: 'Lucknow', country: 'India'}});
@@ -144,6 +143,7 @@ const main = async () => {
     // //     rPrice: toWei(2, 'gwei'),
     // //     rwPrice: toWei(3, 'gwei')
     // // });
+    
 
     // AccountManager.currentIdx = 1;
     // const show = async () => {
