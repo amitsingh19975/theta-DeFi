@@ -36,6 +36,10 @@ export class BasicType{
     get isStr() : boolean { return this._type === Type.String; }
     get isBool() : boolean { return this._type === Type.Boolean; }
 
+    static make(obj: Record<string, unknown>): BasicType {
+        return new BasicType(obj._type as Type, obj._canBeNull as boolean[], obj._arrayDepth as number);
+    }
+
     private typeToGraphQLType() : string {
         switch(this._type) {
         case Type.Int: return 'Int';

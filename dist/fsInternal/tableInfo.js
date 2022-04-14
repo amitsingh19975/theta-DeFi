@@ -43,7 +43,7 @@ const constructInternalFieldType = (f) => {
     var _a;
     return {
         name: f.name.trim(),
-        type: f.type,
+        type: (f.type instanceof types_1.BasicType ? f.type : types_1.BasicType.make(f.type)),
         description: ((_a = f.description) === null || _a === void 0 ? void 0 : _a.trim()) || '',
         map: f.map || exports.defaultMapFn,
         filter: f.filter || exports.defaultFilterFn

@@ -55,7 +55,7 @@ export const defaultFilterFn = () => true;
 const constructInternalFieldType = (f: FieldType) => {
     return {
         name: f.name.trim(),
-        type: f.type,
+        type: ( f.type instanceof BasicType ? f.type : BasicType.make(f.type) ),
         description: f.description?.trim() || '',
         map: f.map || defaultMapFn,
         filter: f.filter || defaultFilterFn

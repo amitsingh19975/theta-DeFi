@@ -418,6 +418,7 @@ declare module "fsInternal/types" {
         get isFloat(): boolean;
         get isStr(): boolean;
         get isBool(): boolean;
+        static make(obj: Record<string, unknown>): BasicType;
         private typeToGraphQLType;
         private toStringHelper;
         toStr(): string;

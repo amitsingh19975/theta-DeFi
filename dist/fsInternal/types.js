@@ -32,6 +32,9 @@ class BasicType {
     get isFloat() { return this._type === Type.Float; }
     get isStr() { return this._type === Type.String; }
     get isBool() { return this._type === Type.Boolean; }
+    static make(obj) {
+        return new BasicType(obj._type, obj._canBeNull, obj._arrayDepth);
+    }
     typeToGraphQLType() {
         switch (this._type) {
             case Type.Int: return 'Int';
