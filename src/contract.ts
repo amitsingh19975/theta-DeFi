@@ -4,8 +4,7 @@ import { BlockAddress } from "./block";
 import { AbiItem, Unit } from "web3-utils";
 import { Contract, DeployOptions, SendOptions } from "web3-eth-contract";
 import AccountManager from "./accountManager";
-import { BasicMarketPayloadType, ChainType, market, MarketMethod } from "./edgeStore";
-import { TableMetadataType } from "./fsInternal/tableFile";
+import { BasicMarketPayloadType, ChainType } from "./edgeStore";
 import BN from "bn.js";
 
 export const toHex = Web3.utils.toHex;
@@ -106,7 +105,7 @@ export default class ShareableStorage {
         this._contract = new ShareableStorage._web.eth.Contract(ShareableStorage._compiledContract.abi as AbiItem[], address || undefined);
     }
 
-    async deploy(args: ContractArgumentType, gas?: number, gasPrice?: string) : Promise<void> {
+    async deploy(account: string, args: ContractArgumentType, gas?: number, gasPrice?: string) : Promise<void> {
         if(!ShareableStorage._web || !ShareableStorage._chainId || !ShareableStorage._compiledContract)
             throw new Error('[ShareableStorage]: "init" was not called!');
 
@@ -116,7 +115,7 @@ export default class ShareableStorage {
         }
 
         const params: SendOptions = {
-            from: AccountManager.main,
+            from: account,
             gas,
             gasPrice,
         }
@@ -136,111 +135,108 @@ export default class ShareableStorage {
         }
     }
 
-    async updatePrice(rPrice: string, rwPrice: string) : Promise<void> {
-        await this.call(ContractMethod.UpdatePrices, [rPrice, rwPrice]);
+    async updatePrice(account: string, rPrice: string, rwPrice: string) : Promise<void> {
+        await this.call(account, ContractMethod.UpdatePrices, [rPrice, rwPrice]);
     }
 
-    async name() : Promise<string|Error> {
-        return await this.call(ContractMethod.Name) as string|Error;
+    async name(account: string) : Promise<string|Error> {
+        return await this.call(account, ContractMethod.Name) as string|Error;
     }
     
-    async symbol() : Promise<string|Error> {
-        return await this.call(ContractMethod.Symbol) as string|Error;
+    async symbol(account: string) : Promise<string|Error> {
+        return await this.call(account, ContractMethod.Symbol) as string|Error;
     }
     
-    async buy(level: AccessLevel, price: string|BN) : Promise<Record<string,unknown>|Error> {
-        return await this.call(ContractMethod.Buy, [level as number], price) as Record<string,unknown>|Error;
+    async buy(account: string, level: AccessLevel, price: string|BN) : Promise<Record<string,unknown>|Error> {
+        return await this.call(account, ContractMethod.Buy, [level as number], price) as Record<string,unknown>|Error;
     }
     
-    async decimals() : Promise<number|Error> {
-        return await this.call(ContractMethod.Decimals) as number|Error;
+    async decimals(account: string) : Promise<number|Error> {
+        return await this.call(account, ContractMethod.Decimals) as number|Error;
     }
     
-    async minAccessLevel() : Promise<AccessLevel|Error> {
-        return await this.call(ContractMethod.MinAccessLevel) as AccessLevel|Error;
+    async minAccessLevel(account: string) : Promise<AccessLevel|Error> {
+        return await this.call(account, ContractMethod.MinAccessLevel) as AccessLevel|Error;
     }
     
-    async maxAccessLevel() : Promise<AccessLevel|Error> {
-        return await this.call(ContractMethod.MaxAccessLevel) as AccessLevel|Error;
+    async maxAccessLevel(account: string) : Promise<AccessLevel|Error> {
+        return await this.call(account, ContractMethod.MaxAccessLevel) as AccessLevel|Error;
     }
     
-    async getBlockAddress() : Promise<string|Error> {
-        return await this.call(ContractMethod.GetBlockAddress) as string|Error;
+    async getBlockAddress(account: string) : Promise<string|Error> {
+        return await this.call(account, ContractMethod.GetBlockAddress) as string|Error;
     }
     
-    async currentAccessLevel(clientAddress?: BlockAddress) : Promise<AccessLevel|Error> {
-        return await this.call(ContractMethod.CurrentAccessLevel, [clientAddress ?  AccountManager.main : clientAddress]) as AccessLevel|Error;
+    async currentAccessLevel(account: string, clientAddress?: BlockAddress) : Promise<AccessLevel|Error> {
+        return await this.call(account, ContractMethod.CurrentAccessLevel, [clientAddress ? account : clientAddress]) as AccessLevel|Error;
     }
     
-    async myAccessLevel() : Promise<AccessLevel|Error> {
-        return await this.call(ContractMethod.MyAccessLevel) as AccessLevel|Error;
+    async myAccessLevel(account: string) : Promise<AccessLevel|Error> {
+        return await this.call(account, ContractMethod.MyAccessLevel) as AccessLevel|Error;
     }
     
-    async hasNoPerm() : Promise<boolean|Error> {
-        return await this.call(ContractMethod.HasNoPerm) as boolean|Error;
+    async hasNoPerm(account: string) : Promise<boolean|Error> {
+        return await this.call(account, ContractMethod.HasNoPerm) as boolean|Error;
     }
 
-    async hasReadPerm() : Promise<boolean|Error> {
-        return await this.call(ContractMethod.HasRPerm) as boolean|Error;
+    async hasReadPerm(account: string) : Promise<boolean|Error> {
+        return await this.call(account, ContractMethod.HasRPerm) as boolean|Error;
     }
 
-    async hasReadWritePerm() : Promise<boolean|Error> {
-        return await this.call(ContractMethod.HasRWPerm) as boolean|Error;
+    async hasReadWritePerm(account: string) : Promise<boolean|Error> {
+        return await this.call(account, ContractMethod.HasRWPerm) as boolean|Error;
     }
 
-    async isOwner() : Promise<boolean|Error> {
-        return await this.call(ContractMethod.IsOwner) as boolean|Error;
+    async isOwner(account: string) : Promise<boolean|Error> {
+        return await this.call(account, ContractMethod.IsOwner) as boolean|Error;
     }
     
-    async getPrices() : Promise<string[]|Error> {
-        const errOr = await this.call(ContractMethod.GetPrices) as string[]|Error;
+    async getPrices(account: string) : Promise<string[]|Error> {
+        const errOr = await this.call(account, ContractMethod.GetPrices) as string[]|Error;
         if(errOr instanceof Error) return errOr;
         return errOr.map(el => fromWei(el, 'Gwei'));
     }
     
-    async updatePermission(clientAddress: BlockAddress, level: AccessLevel) : Promise<Record<string,unknown>|Error> {
+    async updatePermission(account: string, clientAddress: BlockAddress, level: AccessLevel) : Promise<Record<string,unknown>|Error> {
         if(!clientAddress) return new Error('[ShareableStorage]: client address must be non-null address');
-        return await this.call(ContractMethod.UpdatePermission, [clientAddress, level as number]) as Record<string,unknown>|Error;
+        return await this.call(account, ContractMethod.UpdatePermission, [clientAddress, level as number]) as Record<string,unknown>|Error;
     }
     
-    async amountToPayForLevel(level: AccessLevel) : Promise<Record<string,unknown>|Error> {
-        return await this.call(ContractMethod.AmountToPayForLevel, [level as number]) as Record<string,unknown>|Error;
+    async amountToPayForLevel(account: string, level: AccessLevel) : Promise<Record<string,unknown>|Error> {
+        return await this.call(account, ContractMethod.AmountToPayForLevel, [level as number]) as Record<string,unknown>|Error;
     }
     
-    async updateBlockAddress(blockAddress: BlockAddress) : Promise<Record<string,unknown>|Error> {
+    async updateBlockAddress(account: string, blockAddress: BlockAddress) : Promise<Record<string,unknown>|Error> {
         if(!blockAddress) return new Error('[ShareableStorage]: block address must be non-null address');
-        return await this.call(ContractMethod.UpdateBlockAddress, [blockAddress]) as Record<string,unknown>|Error;
+        return await this.call(account, ContractMethod.UpdateBlockAddress, [blockAddress]) as Record<string,unknown>|Error;
     }
 
-    async call(method: ContractMethodValueType, args?: unknown[], price?: string|BN) : Promise<unknown|Error> {
+    async call(account: string, method: ContractMethodValueType, args?: unknown[], price?: string|BN) : Promise<unknown|Error> {
         this._checkAddress();
         const [methodName, type] = method;
         try {
-            return await this._contract.methods[methodName](...args || [])[type]({from: AccountManager.main, value: price})
+            return await this._contract.methods[methodName](...args || [])[type]({from: account, value: price})
                 .then((res: unknown) => res);
         }catch(err){
             return err;
         }
     }
 
-    static async sellTableOnMarket(address: BlockAddress, desc: BasicMarketPayloadType & { tableInfo: TableMetadataType }): Promise<ShareableStorage|Error> {
+    static async deployContract(account: string, address: BlockAddress, desc: BasicMarketPayloadType): Promise<ShareableStorage|Error> {
         if(!address){
             return new Error('[ShareableStorage]: address cannot be null');
         }
 
         const crt = new ShareableStorage(address);
-        await crt.deploy({
-            name: desc.tableInfo.name,
+        await crt.deploy(account, {
+            name: desc.tableName,
             blockAddress: address,
             rPrice: toWei(desc.readPrice.amount, desc.readPrice.unit as Unit),
             rwPrice: toWei(desc.readWritePrice.amount, desc.readWritePrice.unit as Unit)
         });
         
         const contractAddress = crt.address;
-        const res = await market(MarketMethod.AddTable, {...desc, contractAddress});
-        if(res.status !== 200 || 'error' in res.data){
-            return new Error('[ShareableStorage]: ' + res.data.error.mess);
-        }
-        return crt;
+        if(contractAddress) crt;
+        throw new Error('unable to deploy contract');
     }
 }

@@ -15,7 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.FileKind = void 0;
 const fileSystem_1 = require("./fileSystem");
 const contract_1 = __importDefault(require("../contract"));
-const accountManager_1 = require("../accountManager");
 var FileKind;
 (function (FileKind) {
     FileKind[FileKind["Table"] = 0] = "Table";
@@ -33,22 +32,20 @@ class File extends fileSystem_1.FileSystem {
     get blockAddress() { return this._initialBlockAddress; }
     get contractAddress() { return this._contractAddress; }
     get contract() { return this._contract; }
-    share(prices, desc) {
+    share(account, prices) {
         return __awaiter(this, void 0, void 0, function* () {
             if (this.isShared())
                 throw new Error('[File]: File is already shareable!');
-            const user = yield (0, accountManager_1.getUser)();
-            const errOr = yield contract_1.default.sellTableOnMarket(this.blockAddress, {
-                tableInfo: this.getInfo(),
-                userName: user.name,
+            const errOr = yield contract_1.default.deployContract(account, this.blockAddress, {
+                tableName: this.name,
                 readPrice: Object.assign({}, prices.read),
                 readWritePrice: Object.assign({}, prices.readWrite),
-                description: desc || '',
             });
             if (errOr instanceof Error)
                 throw errOr;
             this._contract = errOr;
             this._contractAddress = this._contract.address;
+            return this._contractAddress;
         });
     }
     isShared() { return this.contractAddress !== null; }

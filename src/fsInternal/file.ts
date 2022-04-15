@@ -51,24 +51,21 @@ export default class File extends FileSystem {
     get contractAddress() : BlockAddress { return this._contractAddress; }
     get contract() : ShareableStorage { return this._contract; }
 
-    async share(prices: PriceParamType, desc?: string) : Promise<void> {
+    async share(account: string, prices: PriceParamType) : Promise<BlockAddress> {
         if(this.isShared())
             throw new Error('[File]: File is already shareable!');
 
-        const user = await getUser();
-
-        const errOr = await ShareableStorage.sellTableOnMarket(this.blockAddress, {
-            tableInfo: this.getInfo(),
-            userName: user.name,
+        const errOr = await ShareableStorage.deployContract(account, this.blockAddress, {
+            tableName: this.name,
             readPrice: { ...prices.read },
             readWritePrice: { ...prices.readWrite },
-            description: desc || '',
         })
 
         if(errOr instanceof Error) throw errOr;
 
         this._contract = errOr;
         this._contractAddress = this._contract.address;
+        return this._contractAddress;
     }
 
     isShared() : boolean { return this.contractAddress !== null; }

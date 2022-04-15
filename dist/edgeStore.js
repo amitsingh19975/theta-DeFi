@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.market = exports.MarketMethod = exports.getFile = exports.putFile = exports.getData = exports.putData = exports.getPeers = exports.getStatus = exports.getVersion = exports.validateAddress = exports.validateRow = exports.MAIN_URL = exports.LOCALSERVER_BASE_URL = exports.URLS = exports.makeMarketURL = exports.makeEdgeStoreURL = exports.makeURLFromArgs = exports.initializeEdgeStore = exports.EdgeStoreConfig = exports.MAX_BLOCK_SIZE = exports.ThetaLocalnet = exports.ThetaTestnet = exports.ThetaMainnet = void 0;
+exports.getFile = exports.putFile = exports.getData = exports.putData = exports.getPeers = exports.getStatus = exports.getVersion = exports.validateAddress = exports.validateRow = exports.MAIN_URL = exports.LOCALSERVER_BASE_URL = exports.URLS = exports.makeMarketURL = exports.makeEdgeStoreURL = exports.makeURLFromArgs = exports.initializeEdgeStore = exports.EdgeStoreConfig = exports.MAX_BLOCK_SIZE = exports.ThetaLocalnet = exports.ThetaTestnet = exports.ThetaMainnet = void 0;
 const axios_1 = __importDefault(require("axios"));
 const block_1 = require("./block");
 const config_json_1 = __importDefault(require("./config.json"));
@@ -144,13 +144,4 @@ const putFile = (id, params) => __awaiter(void 0, void 0, void 0, function* () {
 exports.putFile = putFile;
 const getFile = (id, params) => __awaiter(void 0, void 0, void 0, function* () { return postToEdgeStore(EdgeStoreMethod.GetFile, id, params); });
 exports.getFile = getFile;
-var MarketMethod;
-(function (MarketMethod) {
-    MarketMethod["AddTable"] = "Market.AddTable";
-    MarketMethod["AddImage"] = "Market.AddImage";
-})(MarketMethod = exports.MarketMethod || (exports.MarketMethod = {}));
-const market = (method, payload) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield axios_1.default.post(exports.URLS.marketURL, payload);
-});
-exports.market = market;
 //# sourceMappingURL=edgeStore.js.map

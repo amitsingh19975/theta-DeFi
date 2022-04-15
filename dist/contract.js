@@ -14,8 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ContractMethod = exports.CallMethod = exports.SendMethod = exports.AccessLevel = exports.fromWei = exports.toWei = exports.toHex = void 0;
 const web3_1 = __importDefault(require("web3"));
-const accountManager_1 = __importDefault(require("./accountManager"));
-const edgeStore_1 = require("./edgeStore");
 exports.toHex = web3_1.default.utils.toHex;
 const toWei = (val, unit) => {
     switch (typeof val) {
@@ -73,7 +71,7 @@ class ShareableStorage {
     }
     get address() { return this._address; }
     get transcationHash() { return this._transcationHash; }
-    deploy(args, gas, gasPrice) {
+    deploy(account, args, gas, gasPrice) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!ShareableStorage._web || !ShareableStorage._chainId || !ShareableStorage._compiledContract)
                 throw new Error('[ShareableStorage]: "init" was not called!');
@@ -82,7 +80,7 @@ class ShareableStorage {
                 arguments: [args.name, args.blockAddress, args.rPrice, args.rwPrice]
             };
             const params = {
-                from: accountManager_1.default.main,
+                from: account,
                 gas,
                 gasPrice,
             };
@@ -98,109 +96,109 @@ class ShareableStorage {
             throw new Error('[ShareableStorage]: please deploy contract first, or initialize the contract with contract address properly!');
         }
     }
-    updatePrice(rPrice, rwPrice) {
+    updatePrice(account, rPrice, rwPrice) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.call(exports.ContractMethod.UpdatePrices, [rPrice, rwPrice]);
+            yield this.call(account, exports.ContractMethod.UpdatePrices, [rPrice, rwPrice]);
         });
     }
-    name() {
+    name(account) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.call(exports.ContractMethod.Name);
+            return yield this.call(account, exports.ContractMethod.Name);
         });
     }
-    symbol() {
+    symbol(account) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.call(exports.ContractMethod.Symbol);
+            return yield this.call(account, exports.ContractMethod.Symbol);
         });
     }
-    buy(level, price) {
+    buy(account, level, price) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.call(exports.ContractMethod.Buy, [level], price);
+            return yield this.call(account, exports.ContractMethod.Buy, [level], price);
         });
     }
-    decimals() {
+    decimals(account) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.call(exports.ContractMethod.Decimals);
+            return yield this.call(account, exports.ContractMethod.Decimals);
         });
     }
-    minAccessLevel() {
+    minAccessLevel(account) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.call(exports.ContractMethod.MinAccessLevel);
+            return yield this.call(account, exports.ContractMethod.MinAccessLevel);
         });
     }
-    maxAccessLevel() {
+    maxAccessLevel(account) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.call(exports.ContractMethod.MaxAccessLevel);
+            return yield this.call(account, exports.ContractMethod.MaxAccessLevel);
         });
     }
-    getBlockAddress() {
+    getBlockAddress(account) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.call(exports.ContractMethod.GetBlockAddress);
+            return yield this.call(account, exports.ContractMethod.GetBlockAddress);
         });
     }
-    currentAccessLevel(clientAddress) {
+    currentAccessLevel(account, clientAddress) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.call(exports.ContractMethod.CurrentAccessLevel, [clientAddress ? accountManager_1.default.main : clientAddress]);
+            return yield this.call(account, exports.ContractMethod.CurrentAccessLevel, [clientAddress ? account : clientAddress]);
         });
     }
-    myAccessLevel() {
+    myAccessLevel(account) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.call(exports.ContractMethod.MyAccessLevel);
+            return yield this.call(account, exports.ContractMethod.MyAccessLevel);
         });
     }
-    hasNoPerm() {
+    hasNoPerm(account) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.call(exports.ContractMethod.HasNoPerm);
+            return yield this.call(account, exports.ContractMethod.HasNoPerm);
         });
     }
-    hasReadPerm() {
+    hasReadPerm(account) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.call(exports.ContractMethod.HasRPerm);
+            return yield this.call(account, exports.ContractMethod.HasRPerm);
         });
     }
-    hasReadWritePerm() {
+    hasReadWritePerm(account) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.call(exports.ContractMethod.HasRWPerm);
+            return yield this.call(account, exports.ContractMethod.HasRWPerm);
         });
     }
-    isOwner() {
+    isOwner(account) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.call(exports.ContractMethod.IsOwner);
+            return yield this.call(account, exports.ContractMethod.IsOwner);
         });
     }
-    getPrices() {
+    getPrices(account) {
         return __awaiter(this, void 0, void 0, function* () {
-            const errOr = yield this.call(exports.ContractMethod.GetPrices);
+            const errOr = yield this.call(account, exports.ContractMethod.GetPrices);
             if (errOr instanceof Error)
                 return errOr;
             return errOr.map(el => (0, exports.fromWei)(el, 'Gwei'));
         });
     }
-    updatePermission(clientAddress, level) {
+    updatePermission(account, clientAddress, level) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!clientAddress)
                 return new Error('[ShareableStorage]: client address must be non-null address');
-            return yield this.call(exports.ContractMethod.UpdatePermission, [clientAddress, level]);
+            return yield this.call(account, exports.ContractMethod.UpdatePermission, [clientAddress, level]);
         });
     }
-    amountToPayForLevel(level) {
+    amountToPayForLevel(account, level) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.call(exports.ContractMethod.AmountToPayForLevel, [level]);
+            return yield this.call(account, exports.ContractMethod.AmountToPayForLevel, [level]);
         });
     }
-    updateBlockAddress(blockAddress) {
+    updateBlockAddress(account, blockAddress) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!blockAddress)
                 return new Error('[ShareableStorage]: block address must be non-null address');
-            return yield this.call(exports.ContractMethod.UpdateBlockAddress, [blockAddress]);
+            return yield this.call(account, exports.ContractMethod.UpdateBlockAddress, [blockAddress]);
         });
     }
-    call(method, args, price) {
+    call(account, method, args, price) {
         return __awaiter(this, void 0, void 0, function* () {
             this._checkAddress();
             const [methodName, type] = method;
             try {
-                return yield this._contract.methods[methodName](...args || [])[type]({ from: accountManager_1.default.main, value: price })
+                return yield this._contract.methods[methodName](...args || [])[type]({ from: account, value: price })
                     .then((res) => res);
             }
             catch (err) {
@@ -208,24 +206,22 @@ class ShareableStorage {
             }
         });
     }
-    static sellTableOnMarket(address, desc) {
+    static deployContract(account, address, desc) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!address) {
                 return new Error('[ShareableStorage]: address cannot be null');
             }
             const crt = new ShareableStorage(address);
-            yield crt.deploy({
-                name: desc.tableInfo.name,
+            yield crt.deploy(account, {
+                name: desc.tableName,
                 blockAddress: address,
                 rPrice: (0, exports.toWei)(desc.readPrice.amount, desc.readPrice.unit),
                 rwPrice: (0, exports.toWei)(desc.readWritePrice.amount, desc.readWritePrice.unit)
             });
             const contractAddress = crt.address;
-            const res = yield (0, edgeStore_1.market)(edgeStore_1.MarketMethod.AddTable, Object.assign(Object.assign({}, desc), { contractAddress }));
-            if (res.status !== 200 || 'error' in res.data) {
-                return new Error('[ShareableStorage]: ' + res.data.error.mess);
-            }
-            return crt;
+            if (contractAddress)
+                crt;
+            throw new Error('unable to deploy contract');
         });
     }
 }

@@ -359,7 +359,7 @@ declare module "fsInternal/file" {
         get blockAddress(): BlockAddress;
         get contractAddress(): BlockAddress;
         get contract(): ShareableStorage;
-        share(prices: PriceParamType, desc?: string): Promise<void>;
+        share(account: string, prices: PriceParamType): Promise<BlockAddress>;
         isShared(): boolean;
         isTable(): this is TableFile;
         isImage(): boolean;
@@ -680,7 +680,6 @@ declare module "fsInternal/tableFile" {
 }
 declare module "edgeStore" {
     import { Block, BlockAddress, BlockType } from "block";
-    import { TableMetadataType } from "fsInternal/tableFile";
     export type ChainType = {
         url: string;
         chainID: number;
@@ -809,12 +808,8 @@ declare module "edgeStore" {
     export const getData: (id: number | string, params?: Block | StorageType | undefined) => Promise<import("axios").AxiosResponse<any, any>>;
     export const putFile: (id: number | string, params?: Block | StorageType | undefined) => Promise<import("axios").AxiosResponse<any, any>>;
     export const getFile: (id: number | string, params?: Block | StorageType | undefined) => Promise<import("axios").AxiosResponse<any, any>>;
-    export enum MarketMethod {
-        AddTable = "Market.AddTable",
-        AddImage = "Market.AddImage"
-    }
     export type BasicMarketPayloadType = {
-        userName: string;
+        tableName: string;
         readPrice: {
             amount: string;
             unit: string;
@@ -823,13 +818,7 @@ declare module "edgeStore" {
             amount: string;
             unit: string;
         };
-        description: string;
     };
-    export type MarketAddTablePayloadType = BasicMarketPayloadType & {
-        contractAddress: BlockAddress;
-        tableInfo: TableMetadataType;
-    };
-    export const market: (method: MarketMethod, payload: MarketAddTablePayloadType) => Promise<import("axios").AxiosResponse<any, any>>;
 }
 declare module "block" {
     import { BlockDataType, RowType } from "edgeStore";
@@ -866,7 +855,6 @@ declare module "contract" {
     import { BlockAddress } from "block";
     import { Unit } from "web3-utils";
     import { BasicMarketPayloadType, ChainType } from "edgeStore";
-    import { TableMetadataType } from "fsInternal/tableFile";
     import BN from "bn.js";
     export const toHex: (value: string | number | BN) => string;
     export const toWei: (val: string | number | BN, unit?: Unit | undefined) => string | BN;
@@ -917,30 +905,28 @@ declare module "contract" {
         get address(): BlockAddress;
         get transcationHash(): BlockAddress;
         constructor(address?: BlockAddress);
-        deploy(args: ContractArgumentType, gas?: number, gasPrice?: string): Promise<void>;
+        deploy(account: string, args: ContractArgumentType, gas?: number, gasPrice?: string): Promise<void>;
         private _checkAddress;
-        updatePrice(rPrice: string, rwPrice: string): Promise<void>;
-        name(): Promise<string | Error>;
-        symbol(): Promise<string | Error>;
-        buy(level: AccessLevel, price: string | BN): Promise<Record<string, unknown> | Error>;
-        decimals(): Promise<number | Error>;
-        minAccessLevel(): Promise<AccessLevel | Error>;
-        maxAccessLevel(): Promise<AccessLevel | Error>;
-        getBlockAddress(): Promise<string | Error>;
-        currentAccessLevel(clientAddress?: BlockAddress): Promise<AccessLevel | Error>;
-        myAccessLevel(): Promise<AccessLevel | Error>;
-        hasNoPerm(): Promise<boolean | Error>;
-        hasReadPerm(): Promise<boolean | Error>;
-        hasReadWritePerm(): Promise<boolean | Error>;
-        isOwner(): Promise<boolean | Error>;
-        getPrices(): Promise<string[] | Error>;
-        updatePermission(clientAddress: BlockAddress, level: AccessLevel): Promise<Record<string, unknown> | Error>;
-        amountToPayForLevel(level: AccessLevel): Promise<Record<string, unknown> | Error>;
-        updateBlockAddress(blockAddress: BlockAddress): Promise<Record<string, unknown> | Error>;
-        call(method: ContractMethodValueType, args?: unknown[], price?: string | BN): Promise<unknown | Error>;
-        static sellTableOnMarket(address: BlockAddress, desc: BasicMarketPayloadType & {
-            tableInfo: TableMetadataType;
-        }): Promise<ShareableStorage | Error>;
+        updatePrice(account: string, rPrice: string, rwPrice: string): Promise<void>;
+        name(account: string): Promise<string | Error>;
+        symbol(account: string): Promise<string | Error>;
+        buy(account: string, level: AccessLevel, price: string | BN): Promise<Record<string, unknown> | Error>;
+        decimals(account: string): Promise<number | Error>;
+        minAccessLevel(account: string): Promise<AccessLevel | Error>;
+        maxAccessLevel(account: string): Promise<AccessLevel | Error>;
+        getBlockAddress(account: string): Promise<string | Error>;
+        currentAccessLevel(account: string, clientAddress?: BlockAddress): Promise<AccessLevel | Error>;
+        myAccessLevel(account: string): Promise<AccessLevel | Error>;
+        hasNoPerm(account: string): Promise<boolean | Error>;
+        hasReadPerm(account: string): Promise<boolean | Error>;
+        hasReadWritePerm(account: string): Promise<boolean | Error>;
+        isOwner(account: string): Promise<boolean | Error>;
+        getPrices(account: string): Promise<string[] | Error>;
+        updatePermission(account: string, clientAddress: BlockAddress, level: AccessLevel): Promise<Record<string, unknown> | Error>;
+        amountToPayForLevel(account: string, level: AccessLevel): Promise<Record<string, unknown> | Error>;
+        updateBlockAddress(account: string, blockAddress: BlockAddress): Promise<Record<string, unknown> | Error>;
+        call(account: string, method: ContractMethodValueType, args?: unknown[], price?: string | BN): Promise<unknown | Error>;
+        static deployContract(account: string, address: BlockAddress, desc: BasicMarketPayloadType): Promise<ShareableStorage | Error>;
     }
 }
 declare module "solcConfig" {

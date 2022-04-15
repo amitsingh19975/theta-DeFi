@@ -228,13 +228,8 @@ export const getData    = async (id: number | string, params?: StorageType | Blo
 export const putFile    = async (id: number | string, params?: StorageType | Block ) => postToEdgeStore(EdgeStoreMethod.PutFile, id, params);
 export const getFile    = async (id: number | string, params?: StorageType | Block ) => postToEdgeStore(EdgeStoreMethod.GetFile, id, params);
 
-export enum MarketMethod {
-    AddTable = 'Market.AddTable',
-    AddImage = 'Market.AddImage',
-}
-
 export type BasicMarketPayloadType = {
-    userName: string,
+    tableName: string,
     readPrice: {
         amount: string,
         unit: string
@@ -243,14 +238,4 @@ export type BasicMarketPayloadType = {
         amount: string,
         unit: string
     }
-    description: string,
-}
-
-export type MarketAddTablePayloadType = BasicMarketPayloadType & {
-    contractAddress: BlockAddress,
-    tableInfo: TableMetadataType,
-}
-
-export const market = async (method: MarketMethod, payload: MarketAddTablePayloadType) => {
-    return await axios.post(URLS.marketURL, payload);
 }
