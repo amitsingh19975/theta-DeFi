@@ -67,6 +67,16 @@ export class Directory extends FileSystem {
         return true;
     }
 
+    removeChildAt(idx: number) : boolean {
+        if (idx < 0 || idx >= this.children.length) return false;
+        if(this.isFile())
+            return false;        
+        const child = this.children[idx];
+        child.asDir()?.removeAll();
+        this._children.splice(idx, 1);
+        return true;
+    }
+
     addChildren(children: FileSystem[]) {
         for(const c of children){
             this.addChild(c);

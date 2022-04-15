@@ -49,6 +49,17 @@ class Directory extends fileSystem_1.FileSystem {
         this._children.splice(index, 1);
         return true;
     }
+    removeChildAt(idx) {
+        var _b;
+        if (idx < 0 || idx >= this.children.length)
+            return false;
+        if (this.isFile())
+            return false;
+        const child = this.children[idx];
+        (_b = child.asDir()) === null || _b === void 0 ? void 0 : _b.removeAll();
+        this._children.splice(idx, 1);
+        return true;
+    }
     addChildren(children) {
         for (const c of children) {
             this.addChild(c);

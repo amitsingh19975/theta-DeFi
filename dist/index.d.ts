@@ -394,6 +394,7 @@ declare module "fsInternal/directory" {
         getChild(childName: string): FileSystem | null;
         addChild(child: FileSystem): FileSystem;
         removeChild(child: FileSystem): boolean;
+        removeChildAt(idx: number): boolean;
         addChildren(children: FileSystem[]): void;
         removeChildren(children: FileSystem[]): void;
         removeAll(): void;
