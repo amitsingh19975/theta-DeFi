@@ -9,6 +9,7 @@ import { buildSchema, GraphQLSchema } from "graphql";
 import { Block, BlockAddress, BlockType } from "../block";
 import { Path } from "../fs";
 import File, { FileKind, FileSerializeType } from "./file";
+import sizeof from 'object-sizeof';
 
 export type TableFileSerializeType = {
     tableInfo: TableInfoInterface,
@@ -102,8 +103,7 @@ export default class TableFile extends File {
     get rows(): Record<string, unknown>[] { return this._manager?.getData() || [] }
 
     private _calAndSetSize(args: unknown) : void {
-        const json = JSON.stringify(args);
-        this._tempSize += Buffer.byteLength(json);
+        this._tempSize += sizeof(args);
     }
 
     private async _pushRow(manager: BlockManager, args: BlockType) : Promise<void> {

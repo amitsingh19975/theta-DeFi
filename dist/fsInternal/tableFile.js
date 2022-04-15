@@ -31,6 +31,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.buildInputType = exports.buildArgsFromFields = void 0;
 const fileSystem_1 = require("./fileSystem");
@@ -40,6 +43,7 @@ const blockManager_1 = require("../blockManager");
 const graphql_1 = require("graphql");
 const fs_1 = require("../fs");
 const file_1 = __importStar(require("./file"));
+const object_sizeof_1 = __importDefault(require("object-sizeof"));
 const mapBlocks = (blocks) => {
     const res = [];
     blocks.map(block => block.forEach(el => res.push(el)));
@@ -92,8 +96,7 @@ class TableFile extends file_1.default {
     get currentBlocks() { var _a; return ((_a = this._manager) === null || _a === void 0 ? void 0 : _a.getBlocks()) || []; }
     get rows() { var _a; return ((_a = this._manager) === null || _a === void 0 ? void 0 : _a.getData()) || []; }
     _calAndSetSize(args) {
-        const json = JSON.stringify(args);
-        this._tempSize += Buffer.byteLength(json);
+        this._tempSize += (0, object_sizeof_1.default)(args);
     }
     _pushRow(manager, args) {
         return __awaiter(this, void 0, void 0, function* () {

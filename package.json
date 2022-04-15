@@ -31,6 +31,7 @@
     "@thetalabs/theta-js": "^0.0.67",
     "axios": "^0.26.1",
     "graphql": "^16.3.0",
+    "object-sizeof": "^1.6.3",
     "web3": "^1.7.1"
   }
 }
