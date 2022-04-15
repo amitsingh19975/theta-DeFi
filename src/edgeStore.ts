@@ -238,4 +238,5 @@ export type BasicMarketPayloadType = {
         amount: string,
         unit: string
     }
+    blockAddress: BlockAddress
 }

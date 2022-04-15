@@ -98,11 +98,11 @@ export default class ShareableStorage {
     get address() : BlockAddress { return this._address; }
     get transcationHash() : BlockAddress { return this._transcationHash; }
 
-    constructor(address?: BlockAddress){
+    constructor(contractAddress?: BlockAddress){
         if(!ShareableStorage._web || !ShareableStorage._chainId || !ShareableStorage._compiledContract)
             throw new Error('[ShareableStorage]: "init" was not called!');
-        this._address = address || null;
-        this._contract = new ShareableStorage._web.eth.Contract(ShareableStorage._compiledContract.abi as AbiItem[], address || undefined);
+        this._address = contractAddress || null;
+        this._contract = new ShareableStorage._web.eth.Contract(ShareableStorage._compiledContract.abi as AbiItem[], contractAddress || undefined);
     }
 
     async deploy(account: string, args: ContractArgumentType, gas?: number, gasPrice?: string) : Promise<void> {
@@ -222,17 +222,17 @@ export default class ShareableStorage {
         }
     }
 
-    static async deployContract(account: string, address: BlockAddress, desc: BasicMarketPayloadType): Promise<ShareableStorage|Error> {
-        if(!address){
+    static async deployContract(account: string, data: BasicMarketPayloadType): Promise<ShareableStorage|Error> {
+        if(!data.blockAddress){
             return new Error('[ShareableStorage]: address cannot be null');
         }
 
-        const crt = new ShareableStorage(address);
+        const crt = new ShareableStorage();
         await crt.deploy(account, {
-            name: desc.tableName,
-            blockAddress: address,
-            rPrice: toWei(desc.readPrice.amount, desc.readPrice.unit as Unit),
-            rwPrice: toWei(desc.readWritePrice.amount, desc.readWritePrice.unit as Unit)
+            name: data.tableName,
+            blockAddress: data.blockAddress,
+            rPrice: toWei(data.readPrice.amount, data.readPrice.unit as Unit),
+            rwPrice: toWei(data.readWritePrice.amount, data.readWritePrice.unit as Unit)
         });
         
         const contractAddress = crt.address;

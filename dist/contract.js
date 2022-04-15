@@ -56,13 +56,13 @@ exports.ContractMethod = {
     IsOwner: ['isOwner', exports.CallMethod], // function isOwner() public view returns(bool)
 };
 class ShareableStorage {
-    constructor(address) {
+    constructor(contractAddress) {
         this._transcationHash = null;
         this._address = null;
         if (!ShareableStorage._web || !ShareableStorage._chainId || !ShareableStorage._compiledContract)
             throw new Error('[ShareableStorage]: "init" was not called!');
-        this._address = address || null;
-        this._contract = new ShareableStorage._web.eth.Contract(ShareableStorage._compiledContract.abi, address || undefined);
+        this._address = contractAddress || null;
+        this._contract = new ShareableStorage._web.eth.Contract(ShareableStorage._compiledContract.abi, contractAddress || undefined);
     }
     static init(chain, compiledContract) {
         this._chainId = chain.chainID;
@@ -206,17 +206,17 @@ class ShareableStorage {
             }
         });
     }
-    static deployContract(account, address, desc) {
+    static deployContract(account, data) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!address) {
+            if (!data.blockAddress) {
                 return new Error('[ShareableStorage]: address cannot be null');
             }
-            const crt = new ShareableStorage(address);
+            const crt = new ShareableStorage();
             yield crt.deploy(account, {
-                name: desc.tableName,
-                blockAddress: address,
-                rPrice: (0, exports.toWei)(desc.readPrice.amount, desc.readPrice.unit),
-                rwPrice: (0, exports.toWei)(desc.readWritePrice.amount, desc.readWritePrice.unit)
+                name: data.tableName,
+                blockAddress: data.blockAddress,
+                rPrice: (0, exports.toWei)(data.readPrice.amount, data.readPrice.unit),
+                rwPrice: (0, exports.toWei)(data.readWritePrice.amount, data.readWritePrice.unit)
             });
             const contractAddress = crt.address;
             if (contractAddress)

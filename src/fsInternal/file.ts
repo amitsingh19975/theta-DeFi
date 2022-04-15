@@ -55,10 +55,11 @@ export default class File extends FileSystem {
         if(this.isShared())
             throw new Error('[File]: File is already shareable!');
 
-        const errOr = await ShareableStorage.deployContract(account, this.contractAddress, {
+        const errOr = await ShareableStorage.deployContract(account, {
             tableName: this.name,
             readPrice: { ...prices.read },
             readWritePrice: { ...prices.readWrite },
+            blockAddress: this.blockAddress,
         })
 
         if(errOr instanceof Error) throw errOr;

@@ -821,6 +821,7 @@ declare module "edgeStore" {
             amount: string;
             unit: string;
         };
+        blockAddress: BlockAddress;
     };
 }
 declare module "block" {
@@ -907,7 +908,7 @@ declare module "contract" {
         static init(chain: ChainType, compiledContract: ContractInfoType): void;
         get address(): BlockAddress;
         get transcationHash(): BlockAddress;
-        constructor(address?: BlockAddress);
+        constructor(contractAddress?: BlockAddress);
         deploy(account: string, args: ContractArgumentType, gas?: number, gasPrice?: string): Promise<void>;
         private _checkAddress;
         updatePrice(account: string, rPrice: string, rwPrice: string): Promise<void>;
@@ -929,7 +930,7 @@ declare module "contract" {
         amountToPayForLevel(account: string, level: AccessLevel): Promise<Record<string, unknown> | Error>;
         updateBlockAddress(account: string, blockAddress: BlockAddress): Promise<Record<string, unknown> | Error>;
         call(account: string, method: ContractMethodValueType, args?: unknown[], price?: string | BN): Promise<unknown | Error>;
-        static deployContract(account: string, address: BlockAddress, desc: BasicMarketPayloadType): Promise<ShareableStorage | Error>;
+        static deployContract(account: string, data: BasicMarketPayloadType): Promise<ShareableStorage | Error>;
     }
 }
 declare module "solcConfig" {
