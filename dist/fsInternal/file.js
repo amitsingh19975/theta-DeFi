@@ -36,7 +36,7 @@ class File extends fileSystem_1.FileSystem {
         return __awaiter(this, void 0, void 0, function* () {
             if (this.isShared())
                 throw new Error('[File]: File is already shareable!');
-            const errOr = yield contract_1.default.deployContract(account, this.blockAddress, {
+            const errOr = yield contract_1.default.deployContract(account, this.contractAddress, {
                 tableName: this.name,
                 readPrice: Object.assign({}, prices.read),
                 readWritePrice: Object.assign({}, prices.readWrite),
