@@ -3,7 +3,7 @@ import { NodeType } from "./fileSystem";
 import { TableInfo as TableInfo } from "./tableInfo";
 import { TableInfoInterface } from "./tableInfo";
 import { BlockDataType, MAX_BLOCK_SIZE } from "../edgeStore";
-import { AcceptableType, BasicAcceptableType } from "./types";
+import { AcceptableType } from "./types";
 import { BlockManager } from "../blockManager";
 import { buildSchema, GraphQLSchema } from "graphql";
 import { Block, BlockAddress, BlockType } from "../block";
@@ -69,6 +69,7 @@ export default class TableFile extends File {
     private _height = 0;
     private _manager? : BlockManager;
     _callback?: GraphQLExecCallbackType;
+    _committedCallback?: () => void;
 
     private constructor(parent: Directory | null, name: string, fileInfo: TableInfo, blockAddress: BlockAddress, bufferSize: number, contractAddress: BlockAddress) {
         super(parent, name, blockAddress, bufferSize, FileKind.Table, contractAddress);
@@ -89,6 +90,7 @@ export default class TableFile extends File {
     }
 
     setCallback(callback: GraphQLExecCallbackType) : void { this._callback = callback; }
+    setCommittedCallback(callback: () => void) : void { this._committedCallback = callback; }
 
     get approxSize() : number { return this._size + (this._manager?.tempSize || 0); }
 
@@ -101,7 +103,10 @@ export default class TableFile extends File {
 
     private async _pushRow(manager: BlockManager, args: BlockType) : Promise<void> {
         const arr = this._tableInfo.buildRow(args);
-        const res = await manager.pushRow(arr, true, () => this._size += this._manager?.tempSize || 0);
+        const res = await manager.pushRow(arr, true, () => {
+            this._size += this._manager?.tempSize || 0
+            if (this._committedCallback) this._committedCallback();
+        });
 
         if(!res){
             throw new Error(`["addRow"] => unable to add row into the database('${this.tableName}')`)
@@ -148,7 +153,10 @@ export default class TableFile extends File {
             const manager = this._manager;
             if(!manager) throw new Error('[Table]: block manager is not initialized');
 
-            inputs.forEach(async (el) => await this._pushRow(manager, el));
+            for (let i = 0; i < inputs.length; i += 1) {
+                const el = inputs[i];
+                await this._pushRow(manager, el);
+            }
 
             if (this._callback) this._callback({funcName: 'addRows', args: inputs, type: 'Mutation'});
 
@@ -160,7 +168,10 @@ export default class TableFile extends File {
             const manager = this._manager;
             if(!manager) throw new Error('[Table]: block manager is not initialized');
 
-            const res = await manager.commit(() => this._size += this._manager?.tempSize || 0);
+            const res = await manager.commit(() => {
+                this._size += this._manager?.tempSize || 0
+                if (this._committedCallback) this._committedCallback();
+            });
             
             if (this._callback) this._callback({funcName: 'commit', type: 'Mutation'});
 

@@ -655,10 +655,12 @@ declare module "fsInternal/tableFile" {
         private _height;
         private _manager?;
         _callback?: GraphQLExecCallbackType;
+        _committedCallback?: () => void;
         private constructor();
         static make(parent: Directory | null, name: string, fileInfoOrGraphqlSourceCode: TableInfo | string, blockAddress?: BlockAddress, bufferSize?: number, contractAddress?: BlockAddress): TableFile;
         init(): Promise<void>;
         setCallback(callback: GraphQLExecCallbackType): void;
+        setCommittedCallback(callback: () => void): void;
         get approxSize(): number;
         get tableInfo(): TableInfo;
         get tableName(): string;

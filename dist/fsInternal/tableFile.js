@@ -82,6 +82,7 @@ class TableFile extends file_1.default {
         });
     }
     setCallback(callback) { this._callback = callback; }
+    setCommittedCallback(callback) { this._committedCallback = callback; }
     get approxSize() { var _a; return this._size + (((_a = this._manager) === null || _a === void 0 ? void 0 : _a.tempSize) || 0); }
     get tableInfo() { return this._tableInfo; }
     get tableName() { return this._tableInfo.tableName; }
@@ -92,7 +93,12 @@ class TableFile extends file_1.default {
     _pushRow(manager, args) {
         return __awaiter(this, void 0, void 0, function* () {
             const arr = this._tableInfo.buildRow(args);
-            const res = yield manager.pushRow(arr, true, () => { var _a; return this._size += ((_a = this._manager) === null || _a === void 0 ? void 0 : _a.tempSize) || 0; });
+            const res = yield manager.pushRow(arr, true, () => {
+                var _a;
+                this._size += ((_a = this._manager) === null || _a === void 0 ? void 0 : _a.tempSize) || 0;
+                if (this._committedCallback)
+                    this._committedCallback();
+            });
             if (!res) {
                 throw new Error(`["addRow"] => unable to add row into the database('${this.tableName}')`);
             }
@@ -129,7 +135,10 @@ class TableFile extends file_1.default {
             const manager = this._manager;
             if (!manager)
                 throw new Error('[Table]: block manager is not initialized');
-            inputs.forEach((el) => __awaiter(this, void 0, void 0, function* () { return yield this._pushRow(manager, el); }));
+            for (let i = 0; i < inputs.length; i += 1) {
+                const el = inputs[i];
+                yield this._pushRow(manager, el);
+            }
             if (this._callback)
                 this._callback({ funcName: 'addRows', args: inputs, type: 'Mutation' });
             return true;
@@ -138,7 +147,12 @@ class TableFile extends file_1.default {
             const manager = this._manager;
             if (!manager)
                 throw new Error('[Table]: block manager is not initialized');
-            const res = yield manager.commit(() => { var _a; return this._size += ((_a = this._manager) === null || _a === void 0 ? void 0 : _a.tempSize) || 0; });
+            const res = yield manager.commit(() => {
+                var _a;
+                this._size += ((_a = this._manager) === null || _a === void 0 ? void 0 : _a.tempSize) || 0;
+                if (this._committedCallback)
+                    this._committedCallback();
+            });
             if (this._callback)
                 this._callback({ funcName: 'commit', type: 'Mutation' });
             this._height = manager.height;
