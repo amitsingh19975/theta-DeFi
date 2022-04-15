@@ -154,21 +154,20 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     // //     rwPrice: toWei(3, 'gwei')
     // // });
     // mutation {
-    //     addRow(input: 
-    //     {
-    //         name: "Amit Singh", 
-    //         phone: 123
-    //     })
-    //     addRow(input: 
-    //     {
-    //         name: "Vineet Singh", 
-    //         phone: 432
-    //     })
-    //     addRow(input: 
-    //     {
-    //         name: "Tran Singh", 
-    //         phone: 324
-    //     })
+    //     addRows(input: [
+    //         {
+    //             name: "Amit Singh", 
+    //             phone: 123
+    //         },
+    //         {
+    //             name: "Vineet Singh", 
+    //             phone: 432
+    //         },
+    //         {
+    //             name: "Tran Singh", 
+    //             phone: 324
+    //         }
+    //     ])
     // }
     // # {
     // #     person {

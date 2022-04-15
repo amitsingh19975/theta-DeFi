@@ -31,9 +31,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.buildInputType = exports.buildArgsFromFields = void 0;
 const fileSystem_1 = require("./fileSystem");
@@ -43,7 +40,6 @@ const blockManager_1 = require("../blockManager");
 const graphql_1 = require("graphql");
 const fs_1 = require("../fs");
 const file_1 = __importStar(require("./file"));
-const object_sizeof_1 = __importDefault(require("object-sizeof"));
 const mapBlocks = (blocks) => {
     const res = [];
     blocks.map(block => block.forEach(el => res.push(el)));
@@ -69,10 +65,8 @@ class TableFile extends file_1.default {
         var _a;
         super(parent, name, blockAddress, bufferSize, file_1.FileKind.Table, contractAddress);
         this._height = 0;
-        this._tempSize = 0;
         this._tableInfo = fileInfo;
         this._height = ((_a = this._manager) === null || _a === void 0 ? void 0 : _a.height) || 0;
-        this._tempSize = super.size;
     }
     static make(parent, name, fileInfoOrGraphqlSourceCode, blockAddress, bufferSize, contractAddress) {
         if (fileInfoOrGraphqlSourceCode instanceof tableInfo_1.TableInfo) {
@@ -88,24 +82,17 @@ class TableFile extends file_1.default {
         });
     }
     setCallback(callback) { this._callback = callback; }
-    get approxSize() { return this._size + this._tempSize; }
+    get approxSize() { var _a; return this._size + (((_a = this._manager) === null || _a === void 0 ? void 0 : _a.tempSize) || 0); }
     get tableInfo() { return this._tableInfo; }
     get tableName() { return this._tableInfo.tableName; }
     get keys() { return this._tableInfo.keys; }
     get height() { return this._height; }
     get currentBlocks() { var _a; return ((_a = this._manager) === null || _a === void 0 ? void 0 : _a.getBlocks()) || []; }
     get rows() { var _a; return ((_a = this._manager) === null || _a === void 0 ? void 0 : _a.getData()) || []; }
-    _calAndSetSize(args) {
-        this._tempSize += (0, object_sizeof_1.default)(args);
-    }
     _pushRow(manager, args) {
         return __awaiter(this, void 0, void 0, function* () {
             const arr = this._tableInfo.buildRow(args);
-            const res = yield manager.pushRow(arr, true, () => {
-                this._size += this._tempSize;
-                this._tempSize = 0;
-            });
-            this._calAndSetSize(arr);
+            const res = yield manager.pushRow(arr, true, () => { var _a; return this._size += ((_a = this._manager) === null || _a === void 0 ? void 0 : _a.tempSize) || 0; });
             if (!res) {
                 throw new Error(`["addRow"] => unable to add row into the database('${this.tableName}')`);
             }
@@ -151,10 +138,7 @@ class TableFile extends file_1.default {
             const manager = this._manager;
             if (!manager)
                 throw new Error('[Table]: block manager is not initialized');
-            const res = yield manager.commit(() => {
-                this._size += this._tempSize;
-                this._tempSize = 0;
-            });
+            const res = yield manager.commit(() => { var _a; return this._size += ((_a = this._manager) === null || _a === void 0 ? void 0 : _a.tempSize) || 0; });
             if (this._callback)
                 this._callback({ funcName: 'commit', type: 'Mutation' });
             this._height = manager.height;

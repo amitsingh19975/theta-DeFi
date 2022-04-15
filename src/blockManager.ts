@@ -2,6 +2,7 @@ import { Block, BlockAddress, BlockType } from "./block";
 import { MAX_BLOCK_SIZE } from "./edgeStore";
 import RangeCache from "./cache";
 import { Store } from "./store";
+import sizeof from 'object-sizeof';
 
 //| 0| 1| 2|...| 1024| <- |1025|....| 2048|
 
@@ -11,6 +12,7 @@ export class BlockManager {
     private _start = 0;
     private lastLoadedAddress: BlockAddress = null;
     private _committedBlocks: Block[] = [];
+    private _tempSize = 0;
 
     private constructor(private readonly contractAddress: BlockAddress, private readonly keys: string[], private _initialAddress: BlockAddress, private numberOfCachedBlocks = MAX_BLOCK_SIZE * 10){
         this.lastLoadedAddress = this.initialAddress;
@@ -47,6 +49,10 @@ export class BlockManager {
     get initialAddress() : BlockAddress { return this._initialAddress; }
 
     get height() : number { return this._block.height; }
+
+    get currentBlockSize() : number { return this._block.buffer.length }
+
+    get tempSize() : number { return this._tempSize; }
 
     private inCacheBlock(indexOrAddress: BlockAddress|number) : boolean {
         return this._cachedBlocks.inRange(indexOrAddress);
@@ -150,22 +156,23 @@ export class BlockManager {
     }
 
     pushRow = async (row: BlockType, commitIfFull = false, callbackOnCommit?: () => void ) => {
-        if(!commitIfFull){
-            return Store.push(this._block, row);
-        }else{
-            if(!Store.push(this._block, row)){
-                await this.commit(callbackOnCommit);
-                Store.push(this._block, row);
-            }
-            
+        if(Store.push(this._block, row)) {
+            this._tempSize += sizeof(row);
+            return true;
+        }else if(commitIfFull) {
+            await this.commit(callbackOnCommit);
+            Store.push(this._block, row);
+            this._tempSize += sizeof(row);
             return true;
         }
+        return false;
     }
 
     commit = async (callbackOnCommit?: () => void) => {
         const block = await Store.commit( this._block);
         if(!block) return false;
         if(callbackOnCommit) callbackOnCommit();
+        this._tempSize = 0;
         
         const address = Store.lastBlockAddress;
         if(address) this._initialAddress = address;

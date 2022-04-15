@@ -17,6 +17,7 @@ const block_1 = require("./block");
 const edgeStore_1 = require("./edgeStore");
 const cache_1 = __importDefault(require("./cache"));
 const store_1 = require("./store");
+const object_sizeof_1 = __importDefault(require("object-sizeof"));
 //| 0| 1| 2|...| 1024| <- |1025|....| 2048|
 class BlockManager {
     constructor(contractAddress, keys, _initialAddress, numberOfCachedBlocks = edgeStore_1.MAX_BLOCK_SIZE * 10) {
@@ -28,17 +29,19 @@ class BlockManager {
         this._start = 0;
         this.lastLoadedAddress = null;
         this._committedBlocks = [];
+        this._tempSize = 0;
         this.pushRow = (row, commitIfFull = false, callbackOnCommit) => __awaiter(this, void 0, void 0, function* () {
-            if (!commitIfFull) {
-                return store_1.Store.push(this._block, row);
-            }
-            else {
-                if (!store_1.Store.push(this._block, row)) {
-                    yield this.commit(callbackOnCommit);
-                    store_1.Store.push(this._block, row);
-                }
+            if (store_1.Store.push(this._block, row)) {
+                this._tempSize += (0, object_sizeof_1.default)(row);
                 return true;
             }
+            else if (commitIfFull) {
+                yield this.commit(callbackOnCommit);
+                store_1.Store.push(this._block, row);
+                this._tempSize += (0, object_sizeof_1.default)(row);
+                return true;
+            }
+            return false;
         });
         this.commit = (callbackOnCommit) => __awaiter(this, void 0, void 0, function* () {
             const block = yield store_1.Store.commit(this._block);
@@ -46,6 +49,7 @@ class BlockManager {
                 return false;
             if (callbackOnCommit)
                 callbackOnCommit();
+            this._tempSize = 0;
             const address = store_1.Store.lastBlockAddress;
             if (address)
                 this._initialAddress = address;
@@ -83,6 +87,8 @@ class BlockManager {
     get canCommit() { return true; }
     get initialAddress() { return this._initialAddress; }
     get height() { return this._block.height; }
+    get currentBlockSize() { return this._block.buffer.length; }
+    get tempSize() { return this._tempSize; }
     inCacheBlock(indexOrAddress) {
         return this._cachedBlocks.inRange(indexOrAddress);
     }

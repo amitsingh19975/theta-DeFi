@@ -9,7 +9,6 @@ import { buildSchema, GraphQLSchema } from "graphql";
 import { Block, BlockAddress, BlockType } from "../block";
 import { Path } from "../fs";
 import File, { FileKind, FileSerializeType } from "./file";
-import sizeof from 'object-sizeof';
 
 export type TableFileSerializeType = {
     tableInfo: TableInfoInterface,
@@ -69,14 +68,12 @@ export default class TableFile extends File {
     private _tableInfo : TableInfo;
     private _height = 0;
     private _manager? : BlockManager;
-    private _tempSize = 0;
     _callback?: GraphQLExecCallbackType;
 
     private constructor(parent: Directory | null, name: string, fileInfo: TableInfo, blockAddress: BlockAddress, bufferSize: number, contractAddress: BlockAddress) {
         super(parent, name, blockAddress, bufferSize, FileKind.Table, contractAddress);
         this._tableInfo = fileInfo;
         this._height = this._manager?.height || 0;
-        this._tempSize = super.size;
     }
     
     static make(parent: Directory | null, name: string, fileInfoOrGraphqlSourceCode: TableInfo | string, blockAddress?: BlockAddress, bufferSize?: number, contractAddress?: BlockAddress) : TableFile {
@@ -93,7 +90,7 @@ export default class TableFile extends File {
 
     setCallback(callback: GraphQLExecCallbackType) : void { this._callback = callback; }
 
-    get approxSize() : number { return this._size + this._tempSize; }
+    get approxSize() : number { return this._size + (this._manager?.tempSize || 0); }
 
     get tableInfo() : TableInfo { return this._tableInfo; }
     get tableName() : string { return this._tableInfo.tableName; }
@@ -102,18 +99,9 @@ export default class TableFile extends File {
     get currentBlocks(): Block[] { return this._manager?.getBlocks() || []}
     get rows(): Record<string, unknown>[] { return this._manager?.getData() || [] }
 
-    private _calAndSetSize(args: unknown) : void {
-        this._tempSize += sizeof(args);
-    }
-
     private async _pushRow(manager: BlockManager, args: BlockType) : Promise<void> {
         const arr = this._tableInfo.buildRow(args);
-        const res = await manager.pushRow(arr, true, () => {
-            this._size += this._tempSize;
-            this._tempSize = 0;
-        });
-
-        this._calAndSetSize(arr);
+        const res = await manager.pushRow(arr, true, () => this._size += this._manager?.tempSize || 0);
 
         if(!res){
             throw new Error(`["addRow"] => unable to add row into the database('${this.tableName}')`)
@@ -172,10 +160,7 @@ export default class TableFile extends File {
             const manager = this._manager;
             if(!manager) throw new Error('[Table]: block manager is not initialized');
 
-            const res = await manager.commit(() => {
-                this._size += this._tempSize;
-                this._tempSize = 0;
-            });
+            const res = await manager.commit(() => this._size += this._manager?.tempSize || 0);
             
             if (this._callback) this._callback({funcName: 'commit', type: 'Mutation'});
 

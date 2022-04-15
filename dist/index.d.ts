@@ -538,11 +538,14 @@ declare module "blockManager" {
         private _start;
         private lastLoadedAddress;
         private _committedBlocks;
+        private _tempSize;
         private constructor();
         static make(contractAddress: BlockAddress, keys: string[], initialAddress: BlockAddress, numberOfCachedBlocks?: number): Promise<BlockManager>;
         get canCommit(): boolean;
         get initialAddress(): BlockAddress;
         get height(): number;
+        get currentBlockSize(): number;
+        get tempSize(): number;
         private inCacheBlock;
         private findInCachedBlock;
         private clearCache;
@@ -646,7 +649,6 @@ declare module "fsInternal/tableFile" {
         private _tableInfo;
         private _height;
         private _manager?;
-        private _tempSize;
         _callback?: GraphQLExecCallbackType;
         private constructor();
         static make(parent: Directory | null, name: string, fileInfoOrGraphqlSourceCode: TableInfo | string, blockAddress?: BlockAddress, bufferSize?: number, contractAddress?: BlockAddress): TableFile;
@@ -659,7 +661,6 @@ declare module "fsInternal/tableFile" {
         get height(): number;
         get currentBlocks(): Block[];
         get rows(): Record<string, unknown>[];
-        private _calAndSetSize;
         private _pushRow;
         private makeGraphQLMutationResolver;
         getInfo(): TableMetadataType;
