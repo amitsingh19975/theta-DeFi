@@ -72,7 +72,7 @@ class BasicType {
     }
     checkConstraintsArray(val, depth) {
         // console.log(this._canBeNull, depth);
-        if (val === null || val === undefined) {
+        if (val === null || typeof val === 'undefined') {
             return [this.canBeNull(depth), `expected value to be non-null "${this.typeToGraphQLType()}", but found null`];
         }
         if (depth === 0) {
@@ -85,7 +85,7 @@ class BasicType {
         return this.checkConstraintsArray(val[0], depth - 1);
     }
     checkConstraints(val) {
-        if (!val) {
+        if (val === null || typeof val === 'undefined') {
             return [this.canBeNull(0), `expected value to be non-null "${this.typeToGraphQLType()}", but found null`];
         }
         if (Array.isArray(val))

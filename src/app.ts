@@ -189,6 +189,20 @@ const main = async () => {
 // #     }
 // # }
 
+    const carSchema = `
+        type CarSchema {
+            Car: String!
+            MPG: Float!
+            Cylinders: Int!
+            Displacement: Float!
+            Horsepower: Float!
+            Weight: Float!
+            Acceleration: Float!
+            Model: Int!
+            Origin: String!
+        }
+    `;
+
     // AccountManager.currentIdx = 1;
     // const show = async () => {
     //     console.log( '-------------------------' );
