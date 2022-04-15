@@ -155,6 +155,7 @@ class TableFile extends file_1.default {
             });
             if (this._callback)
                 this._callback({ funcName: 'commit', type: 'Mutation' });
+            this._initialBlockAddress = manager.initialAddress ? manager.initialAddress : this._initialBlockAddress;
             this._height = manager.height;
             return res;
         });
