@@ -536,14 +536,12 @@ declare module "blockManager" {
         private _block;
         private _cachedBlocks;
         private _start;
-        private _dirtySize;
         private lastLoadedAddress;
         private _committedBlocks;
         private constructor();
         static make(contractAddress: BlockAddress, keys: string[], initialAddress: BlockAddress, numberOfCachedBlocks?: number): Promise<BlockManager>;
         get canCommit(): boolean;
         get initialAddress(): BlockAddress;
-        get dirtySize(): number;
         get height(): number;
         private inCacheBlock;
         private findInCachedBlock;
@@ -554,9 +552,11 @@ declare module "blockManager" {
         loadNextChunk(): Promise<boolean>;
         loadPrevChunk(): Promise<boolean>;
         getBlocks(): Block[];
+        private _flattenBlock;
+        getData(): Record<string, unknown>[];
         private loadBlock;
-        pushRow: (row: BlockType, commitIfFull?: boolean, callbackOnCommit?: (size: number) => void) => Promise<boolean>;
-        commit: (callbackOnCommit?: (size: number) => void) => Promise<boolean>;
+        pushRow: (row: BlockType, commitIfFull?: boolean, callbackOnCommit?: (() => void) | undefined) => Promise<boolean>;
+        commit: (callbackOnCommit?: (() => void) | undefined) => Promise<boolean>;
     }
 }
 declare module "path" {
@@ -610,7 +610,7 @@ declare module "fsInternal/tableFile" {
     import { BlockDataType } from "edgeStore";
     import { AcceptableType } from "fsInternal/types";
     import { GraphQLSchema } from "graphql";
-    import { Block, BlockAddress, BlockType } from "block";
+    import { Block, BlockAddress } from "block";
     import File, { FileSerializeType } from "fsInternal/file";
     export type TableFileSerializeType = {
         tableInfo: TableInfoInterface;
@@ -629,27 +629,38 @@ declare module "fsInternal/tableFile" {
         height: number;
         fields: [FieldsType];
     };
-    type GraphQLResolverFnType = ((args?: BlockType | {
-        input: BlockType;
-    }) => GraphQLResolverReturnType);
+    type GraphQLResolverFnType = ((args?: Record<string, unknown>) => GraphQLResolverReturnType);
     type GraphQLResolverReturnType = AcceptableType | BlockDataType | TableMetadataType | Promise<AcceptableType | BlockDataType | void | TableMetadataType> | void;
     type GraphQLResolverType = {
         [key: string | symbol]: GraphQLResolverFnType;
     };
     export const buildArgsFromFields: (fileInfo: TableInfo, sep?: string) => string;
     export const buildInputType: (fileInfo: TableInfo) => string[];
+    export type GraphQLExecArgsType = {
+        funcName: string;
+        args?: unknown;
+        type: 'Mutation' | 'Query';
+    };
+    export type GraphQLExecCallbackType = (args: GraphQLExecArgsType) => void;
     export default class TableFile extends File {
         private _tableInfo;
         private _height;
         private _manager?;
+        private _tempSize;
+        _callback?: GraphQLExecCallbackType;
         private constructor();
         static make(parent: Directory | null, name: string, fileInfoOrGraphqlSourceCode: TableInfo | string, blockAddress?: BlockAddress, bufferSize?: number, contractAddress?: BlockAddress): TableFile;
         init(): Promise<void>;
+        setCallback(callback: GraphQLExecCallbackType): void;
+        get approxSize(): number;
         get tableInfo(): TableInfo;
         get tableName(): string;
         get keys(): string[];
         get height(): number;
         get currentBlocks(): Block[];
+        get rows(): Record<string, unknown>[];
+        private _calAndSetSize;
+        private _pushRow;
         private makeGraphQLMutationResolver;
         getInfo(): TableMetadataType;
         makeGraphQLResolver(): GraphQLResolverType;

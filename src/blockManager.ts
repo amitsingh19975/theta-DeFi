@@ -5,47 +5,10 @@ import { Store } from "./store";
 
 //| 0| 1| 2|...| 1024| <- |1025|....| 2048|
 
-const roughSizeOfObject = ( object: BlockType ) => {
-
-    const objectList = [] as unknown[];
-    const stack = [ object ] as unknown[];
-    let bytes = 0;
-
-    while ( stack.length ) {
-        const value = stack.pop();
-
-        if ( typeof value === 'boolean' ) {
-            bytes += 4;
-        }
-        else if ( typeof value === 'string' ) {
-            bytes += (value as string).length * 2;
-        }
-        else if ( typeof value === 'number' ) {
-            bytes += 8;
-        }
-        else if
-        (
-            typeof value === 'object'
-            && objectList.indexOf( value ) === -1
-        )
-        {
-            objectList.push( value );
-            if(value !== null) {
-                for( const i of Object.values(value) ) {
-                    stack.push( i );
-                }
-            }
-
-        }
-    }
-    return bytes;
-}
-
 export class BlockManager {
     private _block: Block;
     private _cachedBlocks = new RangeCache();
     private _start = 0;
-    private _dirtySize = 0;
     private lastLoadedAddress: BlockAddress = null;
     private _committedBlocks: Block[] = [];
 
@@ -83,7 +46,6 @@ export class BlockManager {
 
     get initialAddress() : BlockAddress { return this._initialAddress; }
 
-    get dirtySize() : number { return this._dirtySize; }
     get height() : number { return this._block.height; }
 
     private inCacheBlock(indexOrAddress: BlockAddress|number) : boolean {
@@ -165,15 +127,29 @@ export class BlockManager {
         return res;
     }
 
+    private _flattenBlock(res: Record<string, unknown>[], block: Block): void {
+        block.buffer.forEach((el) => res.push(el));
+    }
+
+    getData() : Record<string, unknown>[] {
+        const res = [] as Record<string, unknown>[];
+        if(!this._block.isEmpty){
+            this._flattenBlock(res, this._block);
+        }
+        
+        this._committedBlocks.forEach(el => this._flattenBlock(res, el));
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        this._cachedBlocks.forEach(([block,_]) => this._flattenBlock(res, block));
+        return res;
+    }
+
 
     private async loadBlock(address: BlockAddress) : Promise<Block|null> {
         const block = this.findInCachedBlock(address);
         return block ? block : await Store.load(address);
     }
 
-    pushRow = async (row: BlockType, commitIfFull = false, callbackOnCommit: (size: number) => void = (size) => size ) => {
-        this._dirtySize += roughSizeOfObject(row);
-        
+    pushRow = async (row: BlockType, commitIfFull = false, callbackOnCommit?: () => void ) => {
         if(!commitIfFull){
             return Store.push(this._block, row);
         }else{
@@ -186,11 +162,10 @@ export class BlockManager {
         }
     }
 
-    commit = async (callbackOnCommit: (size: number) => void = (size) => size) => {
+    commit = async (callbackOnCommit?: () => void) => {
         const block = await Store.commit( this._block);
         if(!block) return false;
-        callbackOnCommit(this._dirtySize);
-        this._dirtySize = 0;
+        if(callbackOnCommit) callbackOnCommit();
         
         const address = Store.lastBlockAddress;
         if(address) this._initialAddress = address;

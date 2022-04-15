@@ -30,7 +30,7 @@ export type TableMetadataType = {
     fields: [FieldsType]
 }
 
-type GraphQLResolverFnType = ((args?: BlockType | {input: BlockType}) => GraphQLResolverReturnType);
+type GraphQLResolverFnType = ((args?: Record<string, unknown>) => GraphQLResolverReturnType);
 
 type GraphQLResolverReturnType = AcceptableType | BlockDataType | TableMetadataType | Promise<AcceptableType|BlockDataType|void|TableMetadataType> | void;
 type GraphQLResolverType = { [key: string|symbol] : GraphQLResolverFnType };
@@ -56,15 +56,26 @@ input ${typeName} {
     `]
 }
 
+export type GraphQLExecArgsType = {
+    funcName: string,
+    args?: unknown,
+    type: 'Mutation'|'Query'
+};
+
+export type GraphQLExecCallbackType = (args: GraphQLExecArgsType) => void;
+
 export default class TableFile extends File {
     private _tableInfo : TableInfo;
     private _height = 0;
     private _manager? : BlockManager;
+    private _tempSize = 0;
+    _callback?: GraphQLExecCallbackType;
 
     private constructor(parent: Directory | null, name: string, fileInfo: TableInfo, blockAddress: BlockAddress, bufferSize: number, contractAddress: BlockAddress) {
         super(parent, name, blockAddress, bufferSize, FileKind.Table, contractAddress);
         this._tableInfo = fileInfo;
         this._height = this._manager?.height || 0;
+        this._tempSize = super.size;
     }
     
     static make(parent: Directory | null, name: string, fileInfoOrGraphqlSourceCode: TableInfo | string, blockAddress?: BlockAddress, bufferSize?: number, contractAddress?: BlockAddress) : TableFile {
@@ -79,37 +90,95 @@ export default class TableFile extends File {
         this._manager = await BlockManager.make(this.contractAddress, this.keys, this.blockAddress);
     }
 
+    setCallback(callback: GraphQLExecCallbackType) : void { this._callback = callback; }
+
+    get approxSize() : number { return this._size + this._tempSize; }
+
     get tableInfo() : TableInfo { return this._tableInfo; }
     get tableName() : string { return this._tableInfo.tableName; }
     get keys() : string[] { return this._tableInfo.keys; }
     get height() : number { return this._height; }
     get currentBlocks(): Block[] { return this._manager?.getBlocks() || []}
+    get rows(): Record<string, unknown>[] { return this._manager?.getData() || [] }
+
+    private _calAndSetSize(args: unknown) : void {
+        const json = JSON.stringify(args);
+        this._tempSize += Buffer.byteLength(json);
+    }
+
+    private async _pushRow(manager: BlockManager, args: BlockType) : Promise<void> {
+        const arr = this._tableInfo.buildRow(args);
+        const res = await manager.pushRow(arr, true, () => {
+            this._size += this._tempSize;
+            this._tempSize = 0;
+        });
+
+        this._calAndSetSize(arr);
+
+        if(!res){
+            throw new Error(`["addRow"] => unable to add row into the database('${this.tableName}')`)
+        }
+        
+        this._initialBlockAddress = manager.initialAddress ? manager.initialAddress : this._initialBlockAddress;
+        this._height = manager.height;
+    }
 
     private makeGraphQLMutationResolver(resolver: GraphQLResolverType) : void {
         resolver['addRow'] = async (args) => {
             if(!args) throw new Error('[resolver] => arguments are undefined!');
+            
+            const input = args.input as BlockType;
 
-            if(!('input' in args)){
-                throw new Error('"input" parameter not found');
+            if(typeof input === 'undefined'){
+                throw new Error('[addRow] => "input" parameter not found');
             }
-            const arr = this._tableInfo.buildRow(args['input'] as unknown as BlockType);
+            
             const manager = this._manager;
             if(!manager) throw new Error('[Table]: block manager is not initialized');
-            const res = await manager.pushRow(arr, true, (size) => this.size += size);
-            if(!res){
-                throw new Error(`["addRow"] => unable to add row into the database('${this.tableName}')`)
+
+
+            await this._pushRow(manager, input);
+
+            if (this._callback) this._callback({funcName: 'addRow', args: args['input'], type: 'Mutation'});
+
+            return true;
+        }
+        
+        resolver['addRows'] = async (args) => {
+            if(!args) throw new Error('[resolver] => arguments are undefined!');
+
+            const inputs = args.input as unknown as BlockType[];
+
+            if(typeof inputs === 'undefined'){
+                throw new Error('[addRows] => "input" parameter not found');
+            }
+            
+            if(!Array.isArray(inputs)){
+                throw new Error('[addRows] => "input" parameter must be an array');
             }
 
-            this._initialBlockAddress = manager.initialAddress ? manager.initialAddress : this._initialBlockAddress;
-            this._height = manager.height;
+            const manager = this._manager;
+            if(!manager) throw new Error('[Table]: block manager is not initialized');
+
+            inputs.forEach(async (el) => await this._pushRow(manager, el));
+
+            if (this._callback) this._callback({funcName: 'addRows', args: inputs, type: 'Mutation'});
+
             return true;
+
         }
 
         resolver['commit'] = async () => {
             const manager = this._manager;
             if(!manager) throw new Error('[Table]: block manager is not initialized');
 
-            const res = await manager.commit((size) => this.size += size);
+            const res = await manager.commit(() => {
+                this._size += this._tempSize;
+                this._tempSize = 0;
+            });
+            
+            if (this._callback) this._callback({funcName: 'commit', type: 'Mutation'});
+
             this._height = manager.height;
             return res;
         }
@@ -141,9 +210,12 @@ export default class TableFile extends File {
 
     makeGraphQLResolver() : GraphQLResolverType {
         const resolver = {} as GraphQLResolverType;
-        resolver[this.name] = () => {
+        resolver['show'] = () => {
             const manager = this._manager;
             if(!manager) throw new Error('[Table]: block manager is not initialized');
+
+            if (this._callback) this._callback({funcName: 'show', type: 'Query'});
+
             return mapBlocks(manager.getBlocks());
         }
 
@@ -160,12 +232,17 @@ export default class TableFile extends File {
             if(!manager) throw new Error('[Table]: block manager is not initialized');
 
             await manager.loadChunkFromInitialAddress(start, end);
+
+            if (this._callback) this._callback({funcName: 'loadChunk', type: 'Query'});
+
             return mapBlocks(manager.getBlocks());
         }
 
         resolver['info'] = () => {
+            if (this._callback) this._callback({funcName: 'info', type: 'Query'});
             return this.getInfo();
         };
+
         this.makeGraphQLMutationResolver(resolver);
         return resolver;
     }
@@ -179,6 +256,7 @@ export default class TableFile extends File {
 
             type Mutation {
                 addRow(input: ${input[0]}!) : Boolean!
+                addRows(input: [${input[0]}!]!) : Boolean!
                 commit : Boolean!
             }
 
@@ -201,7 +279,7 @@ export default class TableFile extends File {
             type Query {
                 info : Info
                 loadChunk(start: Int, end: Int): [${this.tableName}]
-                ${this.tableName[0].toLowerCase() + this.tableName.substring(1)} : [${this.tableName}]
+                show : [${this.tableName}]
             }
         `);
     }

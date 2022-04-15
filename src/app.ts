@@ -102,6 +102,7 @@ import fs from 'fs';
 import config from './solcConfig';
 import { URLS, WindowType } from './edgeStore';
 import { deserializeFileSystem, Directory, makeTable } from './fs';
+import { graphql } from 'graphql';
 
 const compiledContract = JSON.parse(fs.readFileSync(config.contracts.cache).toString());
 
@@ -116,20 +117,39 @@ const main = async () => {
     ShareableStorage.init(URLS.thetanet, compiledContract);
     const file = makeTable('Person', Person);
     await file.init();
-    console.log(file.makeGraphQLSchema());
+    // console.log(file.makeGraphQLSchema());
     // console.log(Directory.root.serialize());
-    // const resolver = file.makeGraphQLResolver();
-    // await resolver.addRow({input: {name: 'A1', phone: 123123, salary: 123.3, city: 'Lucknow', country: 'India'}});
-    // await resolver.addRow({input: {name: 'A2', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
-    // await resolver.addRow({input: {name: 'A3', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
-    // await resolver.addRow({input: {name: 'A4', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
-    // await resolver.addRow({input: {name: 'A5', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
+    const resolver = file.makeGraphQLResolver();
+    await resolver.addRow({input: {name: 'A1', phone: 123123, salary: 123.3, city: 'Lucknow', country: 'India'}});
+    console.log(file.approxSize);
+    await resolver.addRow({input: {name: 'A2', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
+    console.log(file.approxSize);
+    await resolver.addRow({input: {name: 'A3', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
+    console.log(file.approxSize);
+    await resolver.addRow({input: {name: 'A4', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
+    console.log(file.approxSize);
+    await resolver.addRow({input: {name: 'A5', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
+    console.log(file.approxSize);
     // await resolver.commit();
-    // await resolver.addRow({input: {name: 'A6', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
-    // await resolver.addRow({input: {name: 'A7', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
-    // await resolver.addRow({input: {name: 'A8', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
-    // await resolver.addRow({input: {name: 'A9', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
-    // await resolver.addRow({input: {name: 'A10', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
+    await resolver.addRow({input: {name: 'A6', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
+    await resolver.addRow({input: {name: 'A7', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
+    await resolver.addRow({input: {name: 'A8', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
+    await resolver.addRow({input: {name: 'A9', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
+    await resolver.addRow({input: {name: 'A10', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
+    
+    await resolver.addRows( { input: [ 
+        {name: 'A11', phone: 123123, salary: 123.3, city: 'Lucknow', country: 'India'},
+        {name: 'A12', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'},
+        {name: 'A13', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'},
+        {name: 'A14', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'},
+        {name: 'A15', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'},
+        {name: 'A16', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'},
+        {name: 'A17', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'},
+        {name: 'A18', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'},
+        {name: 'A19', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'},
+        {name: 'A20', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}]});
+    graphql({schema: file.makeGraphQLSchema(), source: '{show{name}}' , rootValue: resolver})
+        .then(res => console.log(util.inspect(res.data?.show, {showHidden: false, depth: null, colors: true})));
     // await resolver.commit();
     // file.currentBlocks.forEach(b => console.log(b.buffer));
     // ShareableStorage.init(URLS.thetanet, compiledContract);
@@ -144,6 +164,29 @@ const main = async () => {
     // //     rwPrice: toWei(3, 'gwei')
     // // });
     
+// mutation {
+//     addRow(input: 
+//     {
+//         name: "Amit Singh", 
+//         phone: 123
+//     })
+//     addRow(input: 
+//     {
+//         name: "Vineet Singh", 
+//         phone: 432
+//     })
+//     addRow(input: 
+//     {
+//         name: "Tran Singh", 
+//         phone: 324
+//     })
+// }
+
+// # {
+// #     person {
+// #         name
+// #     }
+// # }
 
     // AccountManager.currentIdx = 1;
     // const show = async () => {

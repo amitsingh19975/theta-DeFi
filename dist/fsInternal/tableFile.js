@@ -65,8 +65,10 @@ class TableFile extends file_1.default {
         var _a;
         super(parent, name, blockAddress, bufferSize, file_1.FileKind.Table, contractAddress);
         this._height = 0;
+        this._tempSize = 0;
         this._tableInfo = fileInfo;
         this._height = ((_a = this._manager) === null || _a === void 0 ? void 0 : _a.height) || 0;
+        this._tempSize = super.size;
     }
     static make(parent, name, fileInfoOrGraphqlSourceCode, blockAddress, bufferSize, contractAddress) {
         if (fileInfoOrGraphqlSourceCode instanceof tableInfo_1.TableInfo) {
@@ -81,35 +83,77 @@ class TableFile extends file_1.default {
             this._manager = yield blockManager_1.BlockManager.make(this.contractAddress, this.keys, this.blockAddress);
         });
     }
+    setCallback(callback) { this._callback = callback; }
+    get approxSize() { return this._size + this._tempSize; }
     get tableInfo() { return this._tableInfo; }
     get tableName() { return this._tableInfo.tableName; }
     get keys() { return this._tableInfo.keys; }
     get height() { return this._height; }
     get currentBlocks() { var _a; return ((_a = this._manager) === null || _a === void 0 ? void 0 : _a.getBlocks()) || []; }
-    makeGraphQLMutationResolver(resolver) {
-        resolver['addRow'] = (args) => __awaiter(this, void 0, void 0, function* () {
-            if (!args)
-                throw new Error('[resolver] => arguments are undefined!');
-            if (!('input' in args)) {
-                throw new Error('"input" parameter not found');
-            }
-            const arr = this._tableInfo.buildRow(args['input']);
-            const manager = this._manager;
-            if (!manager)
-                throw new Error('[Table]: block manager is not initialized');
-            const res = yield manager.pushRow(arr, true, (size) => this.size += size);
+    get rows() { var _a; return ((_a = this._manager) === null || _a === void 0 ? void 0 : _a.getData()) || []; }
+    _calAndSetSize(args) {
+        const json = JSON.stringify(args);
+        this._tempSize += Buffer.byteLength(json);
+    }
+    _pushRow(manager, args) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const arr = this._tableInfo.buildRow(args);
+            const res = yield manager.pushRow(arr, true, () => {
+                this._size += this._tempSize;
+                this._tempSize = 0;
+            });
+            this._calAndSetSize(arr);
             if (!res) {
                 throw new Error(`["addRow"] => unable to add row into the database('${this.tableName}')`);
             }
             this._initialBlockAddress = manager.initialAddress ? manager.initialAddress : this._initialBlockAddress;
             this._height = manager.height;
+        });
+    }
+    makeGraphQLMutationResolver(resolver) {
+        resolver['addRow'] = (args) => __awaiter(this, void 0, void 0, function* () {
+            if (!args)
+                throw new Error('[resolver] => arguments are undefined!');
+            const input = args.input;
+            if (typeof input === 'undefined') {
+                throw new Error('[addRow] => "input" parameter not found');
+            }
+            const manager = this._manager;
+            if (!manager)
+                throw new Error('[Table]: block manager is not initialized');
+            yield this._pushRow(manager, input);
+            if (this._callback)
+                this._callback({ funcName: 'addRow', args: args['input'], type: 'Mutation' });
+            return true;
+        });
+        resolver['addRows'] = (args) => __awaiter(this, void 0, void 0, function* () {
+            if (!args)
+                throw new Error('[resolver] => arguments are undefined!');
+            const inputs = args.input;
+            if (typeof inputs === 'undefined') {
+                throw new Error('[addRows] => "input" parameter not found');
+            }
+            if (!Array.isArray(inputs)) {
+                throw new Error('[addRows] => "input" parameter must be an array');
+            }
+            const manager = this._manager;
+            if (!manager)
+                throw new Error('[Table]: block manager is not initialized');
+            inputs.forEach((el) => __awaiter(this, void 0, void 0, function* () { return yield this._pushRow(manager, el); }));
+            if (this._callback)
+                this._callback({ funcName: 'addRows', args: inputs, type: 'Mutation' });
             return true;
         });
         resolver['commit'] = () => __awaiter(this, void 0, void 0, function* () {
             const manager = this._manager;
             if (!manager)
                 throw new Error('[Table]: block manager is not initialized');
-            const res = yield manager.commit((size) => this.size += size);
+            const res = yield manager.commit(() => {
+                this._size += this._tempSize;
+                this._tempSize = 0;
+            });
+            if (this._callback)
+                this._callback({ funcName: 'commit', type: 'Mutation' });
             this._height = manager.height;
             return res;
         });
@@ -136,10 +180,12 @@ class TableFile extends file_1.default {
     }
     makeGraphQLResolver() {
         const resolver = {};
-        resolver[this.name] = () => {
+        resolver['show'] = () => {
             const manager = this._manager;
             if (!manager)
                 throw new Error('[Table]: block manager is not initialized');
+            if (this._callback)
+                this._callback({ funcName: 'show', type: 'Query' });
             return mapBlocks(manager.getBlocks());
         };
         resolver['loadChunk'] = (args) => __awaiter(this, void 0, void 0, function* () {
@@ -155,9 +201,13 @@ class TableFile extends file_1.default {
             if (!manager)
                 throw new Error('[Table]: block manager is not initialized');
             yield manager.loadChunkFromInitialAddress(start, end);
+            if (this._callback)
+                this._callback({ funcName: 'loadChunk', type: 'Query' });
             return mapBlocks(manager.getBlocks());
         });
         resolver['info'] = () => {
+            if (this._callback)
+                this._callback({ funcName: 'info', type: 'Query' });
             return this.getInfo();
         };
         this.makeGraphQLMutationResolver(resolver);
@@ -172,6 +222,7 @@ class TableFile extends file_1.default {
 
             type Mutation {
                 addRow(input: ${input[0]}!) : Boolean!
+                addRows(input: [${input[0]}!]!) : Boolean!
                 commit : Boolean!
             }
 
@@ -194,7 +245,7 @@ class TableFile extends file_1.default {
             type Query {
                 info : Info
                 loadChunk(start: Int, end: Int): [${this.tableName}]
-                ${this.tableName[0].toLowerCase() + this.tableName.substring(1)} : [${this.tableName}]
+                show : [${this.tableName}]
             }
         `);
     }

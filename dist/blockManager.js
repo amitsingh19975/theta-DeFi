@@ -18,33 +18,6 @@ const edgeStore_1 = require("./edgeStore");
 const cache_1 = __importDefault(require("./cache"));
 const store_1 = require("./store");
 //| 0| 1| 2|...| 1024| <- |1025|....| 2048|
-const roughSizeOfObject = (object) => {
-    const objectList = [];
-    const stack = [object];
-    let bytes = 0;
-    while (stack.length) {
-        const value = stack.pop();
-        if (typeof value === 'boolean') {
-            bytes += 4;
-        }
-        else if (typeof value === 'string') {
-            bytes += value.length * 2;
-        }
-        else if (typeof value === 'number') {
-            bytes += 8;
-        }
-        else if (typeof value === 'object'
-            && objectList.indexOf(value) === -1) {
-            objectList.push(value);
-            if (value !== null) {
-                for (const i of Object.values(value)) {
-                    stack.push(i);
-                }
-            }
-        }
-    }
-    return bytes;
-};
 class BlockManager {
     constructor(contractAddress, keys, _initialAddress, numberOfCachedBlocks = edgeStore_1.MAX_BLOCK_SIZE * 10) {
         this.contractAddress = contractAddress;
@@ -53,11 +26,9 @@ class BlockManager {
         this.numberOfCachedBlocks = numberOfCachedBlocks;
         this._cachedBlocks = new cache_1.default();
         this._start = 0;
-        this._dirtySize = 0;
         this.lastLoadedAddress = null;
         this._committedBlocks = [];
-        this.pushRow = (row, commitIfFull = false, callbackOnCommit = (size) => size) => __awaiter(this, void 0, void 0, function* () {
-            this._dirtySize += roughSizeOfObject(row);
+        this.pushRow = (row, commitIfFull = false, callbackOnCommit) => __awaiter(this, void 0, void 0, function* () {
             if (!commitIfFull) {
                 return store_1.Store.push(this._block, row);
             }
@@ -69,12 +40,12 @@ class BlockManager {
                 return true;
             }
         });
-        this.commit = (callbackOnCommit = (size) => size) => __awaiter(this, void 0, void 0, function* () {
+        this.commit = (callbackOnCommit) => __awaiter(this, void 0, void 0, function* () {
             const block = yield store_1.Store.commit(this._block);
             if (!block)
                 return false;
-            callbackOnCommit(this._dirtySize);
-            this._dirtySize = 0;
+            if (callbackOnCommit)
+                callbackOnCommit();
             const address = store_1.Store.lastBlockAddress;
             if (address)
                 this._initialAddress = address;
@@ -111,7 +82,6 @@ class BlockManager {
     }
     get canCommit() { return true; }
     get initialAddress() { return this._initialAddress; }
-    get dirtySize() { return this._dirtySize; }
     get height() { return this._block.height; }
     inCacheBlock(indexOrAddress) {
         return this._cachedBlocks.inRange(indexOrAddress);
@@ -189,6 +159,19 @@ class BlockManager {
         this._committedBlocks.forEach(el => res.push(el));
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         this._cachedBlocks.forEach(([block, _]) => res.push(block));
+        return res;
+    }
+    _flattenBlock(res, block) {
+        block.buffer.forEach((el) => res.push(el));
+    }
+    getData() {
+        const res = [];
+        if (!this._block.isEmpty) {
+            this._flattenBlock(res, this._block);
+        }
+        this._committedBlocks.forEach(el => this._flattenBlock(res, el));
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        this._cachedBlocks.forEach(([block, _]) => this._flattenBlock(res, block));
         return res;
     }
     loadBlock(address) {
