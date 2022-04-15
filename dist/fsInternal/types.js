@@ -92,6 +92,69 @@ class BasicType {
             return this.checkConstraintsArray(val, this._arrayDepth);
         return this.checkConstraintsHelper(val);
     }
+    _checkNumber(data) {
+        if (Number.isInteger(data)) {
+            if (this.isInt || this.isFloat)
+                return data;
+            throw new Error(`[Invalid Type] expected "${this.toStr()}", but found "${getCorrectType(data)}"`);
+        }
+        if (this.isInt)
+            throw new Error(`[Invalid Type] expected "Int", but got "Float"`);
+        return data;
+    }
+    _parseNumber(data) {
+        const num = Number.parseInt(data);
+        if (this.isInt) {
+            if (Number.isInteger(num))
+                return num;
+            throw new Error('unable to parse string in "Int"');
+        }
+        const float = Number.parseFloat(data);
+        if (this.isFloat && !Number.isNaN(float))
+            return float;
+        throw new Error('unable to parse string in "Float" because we found NaN, while parsing');
+    }
+    _parseBool(data) {
+        const temp = data.toLowerCase();
+        switch (temp) {
+            case 'true':
+            case 't':
+            case '1':
+                return true;
+            case 'false':
+            case 'f':
+            case '0':
+                return false;
+        }
+        throw new Error(`unable to parse ["${data}"] into bool`);
+    }
+    parseType(data) {
+        if (data === null || data === undefined) {
+            if (!this.canBeNull())
+                throw new Error('[Invalid Type] type cannot be null');
+        }
+        if (typeof data !== 'string') {
+            const temp = data;
+            if (this.isStr)
+                return temp.toString();
+            if (typeof data === 'number')
+                return this._checkNumber(data);
+            if (typeof data === 'boolean' && this.isBool)
+                return data;
+            if (!this.checkConstraints(temp))
+                throw new Error(`[Invalid Type] expected "${this.toStr()}", but found "${getCorrectType(temp)}"`);
+        }
+        else {
+            if (this.isStr)
+                return data;
+            if (this.isBool)
+                return this._parseBool(data);
+            if (this.isInt || this.isFloat)
+                return this._parseNumber(data);
+            throw new Error('unknown type found (right now, we are only able to parse basic types, such as Number, String, and Boolean)');
+        }
+        return data;
+    }
 }
 exports.BasicType = BasicType;
 function Int(canBeNullDepth, arrayDepth) {

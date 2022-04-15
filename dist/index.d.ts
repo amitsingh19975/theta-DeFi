@@ -426,6 +426,10 @@ declare module "fsInternal/types" {
         private checkConstraintsHelper;
         private checkConstraintsArray;
         checkConstraints(val: AcceptableType): [boolean, string];
+        private _checkNumber;
+        private _parseNumber;
+        private _parseBool;
+        parseType(data: unknown): BasicAcceptableType;
     }
     export function Int(canBeNullDepth?: boolean[] | boolean, arrayDepth?: number): BasicType;
     export function Str(canBeNullDepth?: boolean[] | boolean, arrayDepth?: number): BasicType;
@@ -468,6 +472,7 @@ declare module "fsInternal/tableInfo" {
         constructor(tableName: string, source?: string, description?: string, fields?: FieldType[]);
         getField(name: string): InternalFieldType | null;
         addField(field: FieldType): boolean;
+        parseType(key: string, data: unknown): AcceptableType;
         get keys(): string[];
         forEach(callback: (el: InternalFieldType, idx: number, arr: InternalFieldType[]) => void): void;
         validateType(name: string, data: AcceptableType, callback: (valid: boolean, dataAfterMapping: AcceptableType, err?: string) => void): void;
@@ -663,6 +668,7 @@ declare module "fsInternal/tableFile" {
         get rows(): Record<string, unknown>[];
         private _pushRow;
         private makeGraphQLMutationResolver;
+        parseTypes(data: Record<string, unknown>): Record<string, unknown>;
         getInfo(): TableMetadataType;
         makeGraphQLResolver(): GraphQLResolverType;
         makeGraphQLSchema(): GraphQLSchema;

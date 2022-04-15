@@ -145,6 +145,13 @@ class TableFile extends file_1.default {
             return res;
         });
     }
+    parseTypes(data) {
+        const res = {};
+        for (const k in data) {
+            res[k] = this._tableInfo.parseType(k, data[k]);
+        }
+        return res;
+    }
     getInfo() {
         const manager = this._manager;
         if (manager)

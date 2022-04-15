@@ -3,7 +3,7 @@ import { NodeType } from "./fileSystem";
 import { TableInfo as TableInfo } from "./tableInfo";
 import { TableInfoInterface } from "./tableInfo";
 import { BlockDataType, MAX_BLOCK_SIZE } from "../edgeStore";
-import { AcceptableType } from "./types";
+import { AcceptableType, BasicAcceptableType } from "./types";
 import { BlockManager } from "../blockManager";
 import { buildSchema, GraphQLSchema } from "graphql";
 import { Block, BlockAddress, BlockType } from "../block";
@@ -167,6 +167,15 @@ export default class TableFile extends File {
             this._height = manager.height;
             return res;
         }
+    }
+
+    parseTypes(data: Record<string, unknown>): Record<string, unknown> {
+        const res = {} as Record<string, unknown>;
+        for(const k in data) {
+            res[k] = this._tableInfo.parseType(k, data[k]);
+        }
+
+        return res;
     }
 
     getInfo() : TableMetadataType {

@@ -103,6 +103,7 @@ import config from './solcConfig';
 import { URLS, WindowType } from './edgeStore';
 import { deserializeFileSystem, Directory, makeTable } from './fs';
 import { graphql } from 'graphql';
+import { Bool, Float, Int, Str } from './fsInternal/types';
 
 const compiledContract = JSON.parse(fs.readFileSync(config.contracts.cache).toString());
 
@@ -150,6 +151,7 @@ const main = async () => {
         {name: 'A20', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}]});
     graphql({schema: file.makeGraphQLSchema(), source: '{show{name}}' , rootValue: resolver})
         .then(res => console.log(util.inspect(res.data?.show, {showHidden: false, depth: null, colors: true})));
+
     // await resolver.commit();
     // file.currentBlocks.forEach(b => console.log(b.buffer));
     // ShareableStorage.init(URLS.thetanet, compiledContract);

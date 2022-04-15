@@ -68,6 +68,13 @@ class TableInfo {
         this.fields.push(constructInternalFieldType(field));
         return true;
     }
+    parseType(key, data) {
+        const field = this.getField(key);
+        if (!field)
+            throw new Error(`Field["${key}"] not found`);
+        const { type } = field;
+        return type.parseType(data);
+    }
     get keys() {
         return this.fields.map(el => el.name).sort();
     }

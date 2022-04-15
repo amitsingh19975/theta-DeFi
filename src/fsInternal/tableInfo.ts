@@ -94,6 +94,13 @@ export class TableInfo{
         return true;
     }
 
+    parseType(key: string, data: unknown): AcceptableType {
+        const field = this.getField(key);
+        if(!field) throw new Error(`Field["${key}"] not found`);
+        const { type } = field;
+        return type.parseType(data);
+    }
+
     get keys() : string[] {
         return this.fields.map(el => el.name).sort();
     }
