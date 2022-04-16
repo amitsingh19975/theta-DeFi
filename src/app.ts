@@ -94,7 +94,7 @@ win['IS_LOCAL'] = false;
 // const cts = contracts.ShareableStorage;
 // console.log(cts.evm.gasEstimates);
 
-import util from 'util';
+// import util from 'util';
 import Web3 from 'web3';
 import ShareableStorage, { AccessLevel, toWei } from "./contract";
 import AccountManager from "./accountManager";
@@ -150,7 +150,8 @@ const main = async () => {
         {name: 'A19', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'},
         {name: 'A20', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}]});
     graphql({schema: file.makeGraphQLSchema(), source: '{show{name}}' , rootValue: resolver})
-        .then(res => console.log(util.inspect(res.data?.show, {showHidden: false, depth: null, colors: true})));
+        // .then(res => console.log(util.inspect(res.data?.show, {showHidden: false, depth: null, colors: true})));
+        .then(res => console.log(res.data?.show));
 
     // await resolver.commit();
     // file.currentBlocks.forEach(b => console.log(b.buffer));
