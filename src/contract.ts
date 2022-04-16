@@ -194,7 +194,7 @@ export default class ShareableStorage {
     async getPrices(account: string) : Promise<string[]|Error> {
         const errOr = await this.call(account, ContractMethod.GetPrices) as string[]|Error;
         if(errOr instanceof Error) return errOr;
-        return errOr.map(el => fromWei(el, 'Gwei'));
+        return errOr;
     }
     
     async updatePermission(account: string, clientAddress: BlockAddress, level: AccessLevel) : Promise<Record<string,unknown>|Error> {

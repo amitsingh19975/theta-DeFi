@@ -171,7 +171,7 @@ class ShareableStorage {
             const errOr = yield this.call(account, exports.ContractMethod.GetPrices);
             if (errOr instanceof Error)
                 return errOr;
-            return errOr.map(el => (0, exports.fromWei)(el, 'Gwei'));
+            return errOr;
         });
     }
     updatePermission(account, clientAddress, level) {
