@@ -206,24 +206,6 @@ class ShareableStorage {
             }
         });
     }
-    static deployContract(account, data) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (!data.blockAddress) {
-                return new Error('[ShareableStorage]: address cannot be null');
-            }
-            const crt = new ShareableStorage();
-            yield crt.deploy(account, {
-                name: data.tableName,
-                blockAddress: data.blockAddress,
-                rPrice: (0, exports.toWei)(data.readPrice.amount, data.readPrice.unit),
-                rwPrice: (0, exports.toWei)(data.readWritePrice.amount, data.readWritePrice.unit)
-            });
-            const contractAddress = crt.address;
-            if (contractAddress)
-                crt;
-            throw new Error('unable to deploy contract');
-        });
-    }
 }
 exports.default = ShareableStorage;
 //# sourceMappingURL=contract.js.map

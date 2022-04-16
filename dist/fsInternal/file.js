@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.FileKind = void 0;
 const fileSystem_1 = require("./fileSystem");
 const contract_1 = __importDefault(require("../contract"));
+const web3_utils_1 = require("web3-utils");
 var FileKind;
 (function (FileKind) {
     FileKind[FileKind["Table"] = 0] = "Table";
@@ -36,15 +37,18 @@ class File extends fileSystem_1.FileSystem {
         return __awaiter(this, void 0, void 0, function* () {
             if (this.isShared())
                 throw new Error('[File]: File is already shareable!');
-            const errOr = yield contract_1.default.deployContract(account, {
-                tableName: this.name,
-                readPrice: Object.assign({}, prices.read),
-                readWritePrice: Object.assign({}, prices.readWrite),
+            if (this.blockAddress === null) {
+                throw new Error('[File]: File is empty');
+            }
+            this._contract = new contract_1.default();
+            const rPrice = (0, web3_utils_1.toWei)(prices.read.amount, prices.read.unit);
+            const rwPrice = (0, web3_utils_1.toWei)(prices.readWrite.amount, prices.readWrite.unit);
+            this._contract.deploy(account, {
+                name: this.name,
+                rPrice,
+                rwPrice,
                 blockAddress: this.blockAddress,
             });
-            if (errOr instanceof Error)
-                throw errOr;
-            this._contract = errOr;
             this._contractAddress = this._contract.address;
             return this._contractAddress;
         });

@@ -4,7 +4,7 @@ import { BlockAddress } from "../block";
 import TableFile, { TableFileSerializeType, TableMetadataType } from "./tableFile";
 import { ImageSerializeType } from "./imageFile";
 import ShareableStorage from "../contract";
-import { Unit } from "web3-utils";
+import { toWei, Unit } from "web3-utils";
 import { getUser } from "../accountManager";
 
 export type FileSerializeType = {
@@ -54,17 +54,22 @@ export default class File extends FileSystem {
     async share(account: string, prices: PriceParamType) : Promise<BlockAddress> {
         if(this.isShared())
             throw new Error('[File]: File is already shareable!');
-
-        const errOr = await ShareableStorage.deployContract(account, {
-            tableName: this.name,
-            readPrice: { ...prices.read },
-            readWritePrice: { ...prices.readWrite },
+        
+        if(this.blockAddress === null) {
+            throw new Error('[File]: File is empty');
+        }
+        
+        this._contract = new ShareableStorage();
+        const rPrice = toWei(prices.read.amount, prices.read.unit);
+        const rwPrice = toWei(prices.readWrite.amount, prices.readWrite.unit);
+        
+        this._contract.deploy(account, {
+            name: this.name,
+            rPrice,
+            rwPrice,
             blockAddress: this.blockAddress,
         })
 
-        if(errOr instanceof Error) throw errOr;
-
-        this._contract = errOr;
         this._contractAddress = this._contract.address;
         return this._contractAddress;
     }

@@ -221,22 +221,4 @@ export default class ShareableStorage {
             return err;
         }
     }
-
-    static async deployContract(account: string, data: BasicMarketPayloadType): Promise<ShareableStorage|Error> {
-        if(!data.blockAddress){
-            return new Error('[ShareableStorage]: address cannot be null');
-        }
-
-        const crt = new ShareableStorage();
-        await crt.deploy(account, {
-            name: data.tableName,
-            blockAddress: data.blockAddress,
-            rPrice: toWei(data.readPrice.amount, data.readPrice.unit as Unit),
-            rwPrice: toWei(data.readWritePrice.amount, data.readWritePrice.unit as Unit)
-        });
-        
-        const contractAddress = crt.address;
-        if(contractAddress) crt;
-        throw new Error('unable to deploy contract');
-    }
 }

@@ -858,7 +858,7 @@ declare module "contract" {
     import Web3 from 'web3';
     import { BlockAddress } from "block";
     import { Unit } from "web3-utils";
-    import { BasicMarketPayloadType, ChainType } from "edgeStore";
+    import { ChainType } from "edgeStore";
     import BN from "bn.js";
     export const toHex: (value: string | number | BN) => string;
     export const toWei: (val: string | number | BN, unit?: Unit | undefined) => string | BN;
@@ -930,7 +930,6 @@ declare module "contract" {
         amountToPayForLevel(account: string, level: AccessLevel): Promise<Record<string, unknown> | Error>;
         updateBlockAddress(account: string, blockAddress: BlockAddress): Promise<Record<string, unknown> | Error>;
         call(account: string, method: ContractMethodValueType, args?: unknown[], price?: string | BN): Promise<unknown | Error>;
-        static deployContract(account: string, data: BasicMarketPayloadType): Promise<ShareableStorage | Error>;
     }
 }
 declare module "solcConfig" {
