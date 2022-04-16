@@ -174,7 +174,7 @@ class TableFile extends file_1.default {
         const fields = [];
         this._tableInfo.forEach(field => fields.push({
             name: field.name,
-            type: field.type.toString(),
+            type: field.type.toStr(),
             description: field.description
         }));
         return {

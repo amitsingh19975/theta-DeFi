@@ -199,7 +199,7 @@ export default class TableFile extends File {
 
         this._tableInfo.forEach(field => fields.push({
             name: field.name,
-            type: field.type.toString(),
+            type: field.type.toStr(),
             description: field.description
         }));
 
