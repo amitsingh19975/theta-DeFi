@@ -950,6 +950,7 @@ declare module "utils" {
 declare module "commands/cd" {
     import { Directory } from "fs";
     export const cd: (path: string | string[], root?: Directory | undefined) => Directory;
+    export const cdWithBothFileAndDirAsLastChild: (path: string | string[], root?: Directory | undefined) => Directory | import("fs").File;
 }
 declare module "commands/ls" {
     import { BlockAddress } from "block";
