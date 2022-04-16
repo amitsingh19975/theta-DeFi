@@ -65,7 +65,7 @@ export const deserializeDir = (dir: DirectorySerializeType, parent?: Directory) 
 export const deserializeFile = (file: FileSerializeType, parent: Directory) => {
     if(file.kind === FileKind.Table){
         const info = TableInfo.deserialize((file.serializedChild as TableFileSerializeType).tableInfo);
-        const temp = TableFile.make(null, file.name, info, file.blockAddress, file.size);
+        const temp = TableFile.make(null, file.name, info, file.blockAddress, file.size, file.contractAddress);
         parent.addChild(temp);
     }else {
         throw new Error('[File]: unkown file kind found!');

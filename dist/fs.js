@@ -96,7 +96,7 @@ exports.deserializeDir = deserializeDir;
 const deserializeFile = (file, parent) => {
     if (file.kind === file_1.FileKind.Table) {
         const info = tableInfo_1.TableInfo.deserialize(file.serializedChild.tableInfo);
-        const temp = tableFile_1.default.make(null, file.name, info, file.blockAddress, file.size);
+        const temp = tableFile_1.default.make(null, file.name, info, file.blockAddress, file.size, file.contractAddress);
         parent.addChild(temp);
     }
     else {
