@@ -62,8 +62,8 @@ export default class File extends FileSystem {
         this._contract = new ShareableStorage();
         const rPrice = toWei(prices.read.amount, prices.read.unit);
         const rwPrice = toWei(prices.readWrite.amount, prices.readWrite.unit);
-        
-        this._contract.deploy(account, {
+
+        await this._contract.deploy(account, {
             name: this.name,
             rPrice,
             rwPrice,

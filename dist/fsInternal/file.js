@@ -43,7 +43,7 @@ class File extends fileSystem_1.FileSystem {
             this._contract = new contract_1.default();
             const rPrice = (0, web3_utils_1.toWei)(prices.read.amount, prices.read.unit);
             const rwPrice = (0, web3_utils_1.toWei)(prices.readWrite.amount, prices.readWrite.unit);
-            this._contract.deploy(account, {
+            yield this._contract.deploy(account, {
                 name: this.name,
                 rPrice,
                 rwPrice,
