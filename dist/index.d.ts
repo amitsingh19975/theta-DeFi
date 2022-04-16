@@ -927,7 +927,7 @@ declare module "contract" {
         isOwner(account: string): Promise<boolean | Error>;
         getPrices(account: string): Promise<string[] | Error>;
         updatePermission(account: string, clientAddress: BlockAddress, level: AccessLevel): Promise<Record<string, unknown> | Error>;
-        amountToPayForLevel(account: string, level: AccessLevel): Promise<Record<string, unknown> | Error>;
+        amountToPayForLevel(account: string, level: AccessLevel): Promise<string | Error>;
         updateBlockAddress(account: string, blockAddress: BlockAddress): Promise<Record<string, unknown> | Error>;
         call(account: string, method: ContractMethodValueType, args?: unknown[], price?: string | BN): Promise<unknown | Error>;
     }

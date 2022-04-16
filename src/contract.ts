@@ -202,8 +202,8 @@ export default class ShareableStorage {
         return await this.call(account, ContractMethod.UpdatePermission, [clientAddress, level as number]) as Record<string,unknown>|Error;
     }
     
-    async amountToPayForLevel(account: string, level: AccessLevel) : Promise<Record<string,unknown>|Error> {
-        return await this.call(account, ContractMethod.AmountToPayForLevel, [level as number]) as Record<string,unknown>|Error;
+    async amountToPayForLevel(account: string, level: AccessLevel) : Promise<string|Error> {
+        return await this.call(account, ContractMethod.AmountToPayForLevel, [level as number]) as string|Error;
     }
     
     async updateBlockAddress(account: string, blockAddress: BlockAddress) : Promise<Record<string,unknown>|Error> {
