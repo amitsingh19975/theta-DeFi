@@ -85,7 +85,7 @@ export default class ShareableStorage {
     static _compiledContract?: ContractInfoType;
     static _web?: Web3;
     static _chainId?: number
-    private _contract: Contract;
+    _contract: Contract;
     private _transcationHash: BlockAddress = null;
     private _address: BlockAddress = null;
 
@@ -215,7 +215,7 @@ export default class ShareableStorage {
         this._checkAddress();
         const [methodName, type] = method;
         try {
-            return await this._contract.methods[methodName](...args || [])[type]({from: account, value: price})
+            return await this._contract.methods[methodName](...args||[])[type]({from: account, value: price})
                 .then((res: unknown) => res);
         }catch(err){
             return err;

@@ -116,41 +116,41 @@ const main = async () => {
     `;
     
     ShareableStorage.init(URLS.thetanet, compiledContract);
-    const file = makeTable('Person', Person);
-    await file.init();
-    // console.log(file.makeGraphQLSchema());
-    // console.log(Directory.root.serialize());
-    const resolver = file.makeGraphQLResolver();
-    await resolver.addRow({input: {name: 'A1', phone: 123123, salary: 123.3, city: 'Lucknow', country: 'India'}});
-    console.log(file.approxSize);
-    await resolver.addRow({input: {name: 'A2', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
-    console.log(file.approxSize);
-    await resolver.addRow({input: {name: 'A3', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
-    console.log(file.approxSize);
-    await resolver.addRow({input: {name: 'A4', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
-    console.log(file.approxSize);
-    await resolver.addRow({input: {name: 'A5', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
-    console.log(file.approxSize);
-    // await resolver.commit();
-    await resolver.addRow({input: {name: 'A6', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
-    await resolver.addRow({input: {name: 'A7', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
-    await resolver.addRow({input: {name: 'A8', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
-    await resolver.addRow({input: {name: 'A9', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
-    await resolver.addRow({input: {name: 'A10', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
+    // const file = makeTable('Person', Person);
+    // await file.init();
+    // // console.log(file.makeGraphQLSchema());
+    // // console.log(Directory.root.serialize());
+    // const resolver = file.makeGraphQLResolver();
+    // await resolver.addRow({input: {name: 'A1', phone: 123123, salary: 123.3, city: 'Lucknow', country: 'India'}});
+    // console.log(file.approxSize);
+    // await resolver.addRow({input: {name: 'A2', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
+    // console.log(file.approxSize);
+    // await resolver.addRow({input: {name: 'A3', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
+    // console.log(file.approxSize);
+    // await resolver.addRow({input: {name: 'A4', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
+    // console.log(file.approxSize);
+    // await resolver.addRow({input: {name: 'A5', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
+    // console.log(file.approxSize);
+    // // await resolver.commit();
+    // await resolver.addRow({input: {name: 'A6', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
+    // await resolver.addRow({input: {name: 'A7', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
+    // await resolver.addRow({input: {name: 'A8', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
+    // await resolver.addRow({input: {name: 'A9', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
+    // await resolver.addRow({input: {name: 'A10', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
     
-    await resolver.addRows( { input: [ 
-        {name: 'A11', phone: 123123, salary: 123.3, city: 'Lucknow', country: 'India'},
-        {name: 'A12', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'},
-        {name: 'A13', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'},
-        {name: 'A14', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'},
-        {name: 'A15', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'},
-        {name: 'A16', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'},
-        {name: 'A17', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'},
-        {name: 'A18', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'},
-        {name: 'A19', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'},
-        {name: 'A20', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}]});
-    graphql({schema: file.makeGraphQLSchema(), source: '{show{name}}' , rootValue: resolver})
-        .then(res => console.log(util.inspect(res.data?.show, {showHidden: false, depth: null, colors: true})));
+    // await resolver.addRows( { input: [ 
+    //     {name: 'A11', phone: 123123, salary: 123.3, city: 'Lucknow', country: 'India'},
+    //     {name: 'A12', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'},
+    //     {name: 'A13', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'},
+    //     {name: 'A14', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'},
+    //     {name: 'A15', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'},
+    //     {name: 'A16', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'},
+    //     {name: 'A17', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'},
+    //     {name: 'A18', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'},
+    //     {name: 'A19', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'},
+    //     {name: 'A20', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}]});
+    // graphql({schema: file.makeGraphQLSchema(), source: '{show{name}}' , rootValue: resolver})
+    //     .then(res => console.log(util.inspect(res.data?.show, {showHidden: false, depth: null, colors: true})));
 
     // await resolver.commit();
     // file.currentBlocks.forEach(b => console.log(b.buffer));
@@ -158,7 +158,9 @@ const main = async () => {
     // const web = ShareableStorage._web;
     // if (!web) return;
     // console.log(await web.eth.net.isListening());
-    // const crt = new ShareableStorage('0x690b076B0442c445CbE7ba50F8245E60f6BE9dD1');
+    // const account = '0x19E7E376E7C213B7E7e7e46cc70A5dD086DAff2A';
+    // const crt = new ShareableStorage('0xf9920B0CE4a279820403dE49385D6e3DC5eCe878')._contract;
+    // console.log(await crt.methods.amountToPayForLevel(1).call({from: account}).then(res => res));
     // // await crt.deploy({
     // //     name: 'Testing',
     // //     blockAddress: '0x123123adfa1',

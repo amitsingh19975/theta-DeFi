@@ -21,7 +21,7 @@ contract ShareableToken is Context, IST, Payable {
         mName = _name;
         mSymbol = _symbol;
         mMaxLevel = _maxLevel;
-        _prices = new uint[](mMaxLevel);
+        _prices = new uint[](_maxLevel);
     }
 
     function minAccessLevel() public pure override returns(uint8) {
@@ -48,10 +48,7 @@ contract ShareableToken is Context, IST, Payable {
 
     function amountToPayForLevel(uint8 lvl) public view override returns(uint) {
         uint8 currLevel = currentAccessLevel(msgSender());
-        require(currLevel < lvl && lvl <= maxAccessLevel(), 
-            "[ShareableToken(amountToPayForLevel)]: new access level must be greater than current access level"
-        );
-
+        if (lvl > maxAccessLevel()) return 0;
         return _amountToPay(_prices[lvl], _prices[currLevel]);
     }
 
