@@ -55,6 +55,30 @@ exports.ContractMethod = {
     GetPrices: ['getPrices', exports.CallMethod],
     IsOwner: ['isOwner', exports.CallMethod], // function isOwner() public view returns(bool)
 };
+const parseInt = (data) => {
+    if (data instanceof Error)
+        return data;
+    if (typeof data === 'number')
+        return data;
+    if (typeof data === 'string')
+        return Number.parseInt(data);
+    throw new Error('unknown type');
+};
+const parseBool = (data) => {
+    if (data instanceof Error)
+        return data;
+    if (typeof data === 'boolean')
+        return data;
+    if (typeof data === 'number')
+        return Boolean(data);
+    if (typeof data === 'string') {
+        switch (data.toLowerCase()) {
+            case 'true': return true;
+            case 'false': return false;
+        }
+    }
+    throw new Error('unknown type');
+};
 class ShareableStorage {
     constructor(contractAddress) {
         this._transcationHash = null;
@@ -118,17 +142,17 @@ class ShareableStorage {
     }
     decimals(account) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.call(account, exports.ContractMethod.Decimals);
+            return parseInt(yield this.call(account, exports.ContractMethod.Decimals));
         });
     }
     minAccessLevel(account) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.call(account, exports.ContractMethod.MinAccessLevel);
+            return parseInt(yield this.call(account, exports.ContractMethod.MinAccessLevel));
         });
     }
     maxAccessLevel(account) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.call(account, exports.ContractMethod.MaxAccessLevel);
+            return parseInt(yield this.call(account, exports.ContractMethod.MaxAccessLevel));
         });
     }
     getBlockAddress(account) {
@@ -138,32 +162,32 @@ class ShareableStorage {
     }
     currentAccessLevel(account, clientAddress) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.call(account, exports.ContractMethod.CurrentAccessLevel, [clientAddress ? account : clientAddress]);
+            return parseInt(yield this.call(account, exports.ContractMethod.CurrentAccessLevel, [clientAddress ? account : clientAddress]));
         });
     }
     myAccessLevel(account) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.call(account, exports.ContractMethod.MyAccessLevel);
+            return parseInt(yield this.call(account, exports.ContractMethod.MyAccessLevel));
         });
     }
     hasNoPerm(account) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.call(account, exports.ContractMethod.HasNoPerm);
+            return parseBool(yield this.call(account, exports.ContractMethod.HasNoPerm));
         });
     }
     hasReadPerm(account) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.call(account, exports.ContractMethod.HasRPerm);
+            return parseBool(yield this.call(account, exports.ContractMethod.HasRPerm));
         });
     }
     hasReadWritePerm(account) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.call(account, exports.ContractMethod.HasRWPerm);
+            return parseBool(yield this.call(account, exports.ContractMethod.HasRWPerm));
         });
     }
     isOwner(account) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.call(account, exports.ContractMethod.IsOwner);
+            return parseBool(yield this.call(account, exports.ContractMethod.IsOwner));
         });
     }
     getPrices(account) {

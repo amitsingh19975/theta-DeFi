@@ -158,9 +158,10 @@ const main = async () => {
     // const web = ShareableStorage._web;
     // if (!web) return;
     // console.log(await web.eth.net.isListening());
-    // const account = '0x19E7E376E7C213B7E7e7e46cc70A5dD086DAff2A';
-    // const crt = new ShareableStorage('0xf9920B0CE4a279820403dE49385D6e3DC5eCe878')._contract;
-    // console.log(await crt.methods.amountToPayForLevel(1).call({from: account}).then(res => res));
+    const account = '0x19E7E376E7C213B7E7e7e46cc70A5dD086DAff2A';
+    const crt = new ShareableStorage('0x34036b251d6dB7C5F71f337560410785b627860d');
+    const res = await crt.myAccessLevel(account);
+    console.log(res, typeof res);
     // // await crt.deploy({
     // //     name: 'Testing',
     // //     blockAddress: '0x123123adfa1',

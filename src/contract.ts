@@ -81,11 +81,31 @@ export const ContractMethod = {
     IsOwner             : ['isOwner', CallMethod ] as ContractMethodValueType,            // function isOwner() public view returns(bool)
 }
 
+const parseInt = (data: unknown) => {
+    if (data instanceof Error) return data;
+    if (typeof data === 'number') return data;
+    if (typeof data === 'string') return Number.parseInt(data);
+    throw new Error('unknown type');
+}
+
+const parseBool = (data: unknown) => {
+    if (data instanceof Error) return data;
+    if (typeof data === 'boolean') return data;
+    if (typeof data === 'number') return Boolean(data);
+    if (typeof data === 'string') {
+        switch(data.toLowerCase()) {
+        case 'true': return true;
+        case 'false': return false;
+        }
+    }
+    throw new Error('unknown type');
+}
+
 export default class ShareableStorage {
     static _compiledContract?: ContractInfoType;
     static _web?: Web3;
     static _chainId?: number
-    _contract: Contract;
+    private _contract: Contract;
     private _transcationHash: BlockAddress = null;
     private _address: BlockAddress = null;
 
@@ -152,15 +172,15 @@ export default class ShareableStorage {
     }
     
     async decimals(account: string) : Promise<number|Error> {
-        return await this.call(account, ContractMethod.Decimals) as number|Error;
+        return parseInt(await this.call(account, ContractMethod.Decimals))
     }
     
     async minAccessLevel(account: string) : Promise<AccessLevel|Error> {
-        return await this.call(account, ContractMethod.MinAccessLevel) as AccessLevel|Error;
+        return parseInt(await this.call(account, ContractMethod.MinAccessLevel))
     }
     
     async maxAccessLevel(account: string) : Promise<AccessLevel|Error> {
-        return await this.call(account, ContractMethod.MaxAccessLevel) as AccessLevel|Error;
+        return parseInt(await this.call(account, ContractMethod.MaxAccessLevel))
     }
     
     async getBlockAddress(account: string) : Promise<string|Error> {
@@ -168,27 +188,27 @@ export default class ShareableStorage {
     }
     
     async currentAccessLevel(account: string, clientAddress?: BlockAddress) : Promise<AccessLevel|Error> {
-        return await this.call(account, ContractMethod.CurrentAccessLevel, [clientAddress ? account : clientAddress]) as AccessLevel|Error;
+        return parseInt(await this.call(account, ContractMethod.CurrentAccessLevel, [clientAddress ? account : clientAddress]))
     }
     
     async myAccessLevel(account: string) : Promise<AccessLevel|Error> {
-        return await this.call(account, ContractMethod.MyAccessLevel) as AccessLevel|Error;
+        return parseInt(await this.call(account, ContractMethod.MyAccessLevel))
     }
     
     async hasNoPerm(account: string) : Promise<boolean|Error> {
-        return await this.call(account, ContractMethod.HasNoPerm) as boolean|Error;
+        return parseBool(await this.call(account, ContractMethod.HasNoPerm));
     }
 
     async hasReadPerm(account: string) : Promise<boolean|Error> {
-        return await this.call(account, ContractMethod.HasRPerm) as boolean|Error;
+        return parseBool(await this.call(account, ContractMethod.HasRPerm));
     }
 
     async hasReadWritePerm(account: string) : Promise<boolean|Error> {
-        return await this.call(account, ContractMethod.HasRWPerm) as boolean|Error;
+        return parseBool(await this.call(account, ContractMethod.HasRWPerm));
     }
 
     async isOwner(account: string) : Promise<boolean|Error> {
-        return await this.call(account, ContractMethod.IsOwner) as boolean|Error;
+        return parseBool(await this.call(account, ContractMethod.IsOwner));
     }
     
     async getPrices(account: string) : Promise<string[]|Error> {
