@@ -53,6 +53,17 @@ class File extends fileSystem_1.FileSystem {
             return this._contractAddress;
         });
     }
+    updateAddressFromContract(account) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.isShared())
+                return;
+            const crt = this.contract;
+            const addressOnContractOr = yield crt.getBlockAddress(account);
+            if (addressOnContractOr instanceof Error)
+                throw addressOnContractOr;
+            this._initialBlockAddress = addressOnContractOr;
+        });
+    }
     isShared() { return this.contractAddress !== null; }
     isTable() { return this.kind === FileKind.Table; }
     isImage() { return this.kind === FileKind.Image; }

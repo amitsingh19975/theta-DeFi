@@ -160,7 +160,7 @@ const main = async () => {
     // console.log(await web.eth.net.isListening());
     const account = '0x19E7E376E7C213B7E7e7e46cc70A5dD086DAff2A';
     const crt = new ShareableStorage('0x34036b251d6dB7C5F71f337560410785b627860d');
-    const res = await crt.myAccessLevel(account);
+    const res = await crt.hasReadWritePerm(account);
     console.log(res, typeof res);
     // // await crt.deploy({
     // //     name: 'Testing',

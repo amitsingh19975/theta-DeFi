@@ -74,6 +74,14 @@ export default class File extends FileSystem {
         return this._contractAddress;
     }
 
+    async updateAddressFromContract(account: string): Promise<void> {
+        if (!this.isShared()) return;
+        const crt = this.contract;
+        const addressOnContractOr = await crt.getBlockAddress(account);
+        if (addressOnContractOr instanceof Error) throw addressOnContractOr;
+        this._initialBlockAddress = addressOnContractOr;
+    }
+
     isShared() : boolean { return this.contractAddress !== null; }
     
 

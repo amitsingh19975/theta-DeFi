@@ -360,6 +360,7 @@ declare module "fsInternal/file" {
         get contractAddress(): BlockAddress;
         get contract(): ShareableStorage;
         share(account: string, prices: PriceParamType): Promise<BlockAddress>;
+        updateAddressFromContract(account: string): Promise<void>;
         isShared(): boolean;
         isTable(): this is TableFile;
         isImage(): boolean;
