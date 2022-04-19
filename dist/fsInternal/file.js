@@ -26,6 +26,7 @@ class File extends fileSystem_1.FileSystem {
     constructor(parent, name, _initialBlockAddress, bufferSize, kind, contractAddress) {
         super(parent, name, fileSystem_1.NodeType.File, bufferSize);
         this._initialBlockAddress = _initialBlockAddress;
+        this._oldAddress = null;
         this.kind = kind;
         this._contractAddress = contractAddress;
         this._contract = new contract_1.default(contractAddress);
@@ -61,8 +62,15 @@ class File extends fileSystem_1.FileSystem {
             const addressOnContractOr = yield crt.getBlockAddress(account);
             if (addressOnContractOr instanceof Error)
                 throw addressOnContractOr;
+            this._oldAddress = this._initialBlockAddress;
             this._initialBlockAddress = addressOnContractOr;
         });
+    }
+    resetBlockAddress() {
+        if (!this._oldAddress)
+            return;
+        this._initialBlockAddress = this._oldAddress;
+        this._oldAddress = null;
     }
     isShared() { return this.contractAddress !== null; }
     isTable() { return this.kind === FileKind.Table; }

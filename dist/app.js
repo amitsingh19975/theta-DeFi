@@ -18,6 +18,7 @@ const contract_1 = __importDefault(require("./contract"));
 const fs_1 = __importDefault(require("fs"));
 const solcConfig_1 = __importDefault(require("./solcConfig"));
 const edgeStore_1 = require("./edgeStore");
+const web3_utils_1 = require("web3-utils");
 const compiledContract = JSON.parse(fs_1.default.readFileSync(solcConfig_1.default.contracts.cache).toString());
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const Person = `
@@ -29,8 +30,8 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     contract_1.default.init(edgeStore_1.URLS.thetanet, compiledContract);
     // const file = makeTable('Person', Person);
     // await file.init();
-    // // console.log(file.makeGraphQLSchema());
-    // // console.log(Directory.root.serialize());
+    // console.log(file.makeGraphQLSchema());
+    // console.log(JSON.stringify(Directory.root.serialize()));
     // const resolver = file.makeGraphQLResolver();
     // await resolver.addRow({input: {name: 'A1', phone: 123123, salary: 123.3, city: 'Lucknow', country: 'India'}});
     // console.log(file.approxSize);
@@ -68,9 +69,10 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     // if (!web) return;
     // console.log(await web.eth.net.isListening());
     const account = '0x19E7E376E7C213B7E7e7e46cc70A5dD086DAff2A';
-    const crt = new contract_1.default('0x34036b251d6dB7C5F71f337560410785b627860d');
-    const res = yield crt.hasReadWritePerm(account);
-    console.log(res, typeof res);
+    const web = contract_1.default._web;
+    if (!web)
+        return;
+    console.log((0, web3_utils_1.fromWei)(yield web.eth.getBalance(account)));
     // // await crt.deploy({
     // //     name: 'Testing',
     // //     blockAddress: '0x123123adfa1',

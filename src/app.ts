@@ -104,6 +104,7 @@ import { URLS, WindowType } from './edgeStore';
 import { deserializeFileSystem, Directory, makeTable } from './fs';
 import { graphql } from 'graphql';
 import { Bool, Float, Int, Str } from './fsInternal/types';
+import { fromWei } from 'web3-utils';
 
 const compiledContract = JSON.parse(fs.readFileSync(config.contracts.cache).toString());
 
@@ -118,8 +119,8 @@ const main = async () => {
     ShareableStorage.init(URLS.thetanet, compiledContract);
     // const file = makeTable('Person', Person);
     // await file.init();
-    // // console.log(file.makeGraphQLSchema());
-    // // console.log(Directory.root.serialize());
+    // console.log(file.makeGraphQLSchema());
+    // console.log(JSON.stringify(Directory.root.serialize()));
     // const resolver = file.makeGraphQLResolver();
     // await resolver.addRow({input: {name: 'A1', phone: 123123, salary: 123.3, city: 'Lucknow', country: 'India'}});
     // console.log(file.approxSize);
@@ -159,9 +160,10 @@ const main = async () => {
     // if (!web) return;
     // console.log(await web.eth.net.isListening());
     const account = '0x19E7E376E7C213B7E7e7e46cc70A5dD086DAff2A';
-    const crt = new ShareableStorage('0x34036b251d6dB7C5F71f337560410785b627860d');
-    const res = await crt.hasReadWritePerm(account);
-    console.log(res, typeof res);
+    const web = ShareableStorage._web;
+    if (!web) return;
+    console.log(fromWei(await web.eth.getBalance(account)));
+    
     // // await crt.deploy({
     // //     name: 'Testing',
     // //     blockAddress: '0x123123adfa1',

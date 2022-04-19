@@ -355,12 +355,14 @@ declare module "fsInternal/file" {
         readonly kind: FileKind;
         protected _contractAddress: BlockAddress;
         protected _contract: ShareableStorage;
+        private _oldAddress;
         protected constructor(parent: Directory | null, name: string, _initialBlockAddress: BlockAddress, bufferSize: number, kind: FileKind, contractAddress: BlockAddress);
         get blockAddress(): BlockAddress;
         get contractAddress(): BlockAddress;
         get contract(): ShareableStorage;
         share(account: string, prices: PriceParamType): Promise<BlockAddress>;
         updateAddressFromContract(account: string): Promise<void>;
+        resetBlockAddress(): void;
         isShared(): boolean;
         isTable(): this is TableFile;
         isImage(): boolean;

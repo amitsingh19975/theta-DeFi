@@ -39,6 +39,7 @@ export default class File extends FileSystem {
     readonly kind: FileKind;
     protected _contractAddress: BlockAddress;
     protected _contract: ShareableStorage;
+    private _oldAddress: BlockAddress = null;
 
     protected constructor(parent: Directory | null, name: string, protected _initialBlockAddress: BlockAddress, bufferSize: number, kind: FileKind, contractAddress: BlockAddress) {
         super(parent, name, NodeType.File, bufferSize);
@@ -79,7 +80,14 @@ export default class File extends FileSystem {
         const crt = this.contract;
         const addressOnContractOr = await crt.getBlockAddress(account);
         if (addressOnContractOr instanceof Error) throw addressOnContractOr;
+        this._oldAddress = this._initialBlockAddress;
         this._initialBlockAddress = addressOnContractOr;
+    }
+
+    resetBlockAddress(): void {
+        if (!this._oldAddress) return;
+        this._initialBlockAddress = this._oldAddress;
+        this._oldAddress = null;
     }
 
     isShared() : boolean { return this.contractAddress !== null; }
