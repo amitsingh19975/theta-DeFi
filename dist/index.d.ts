@@ -877,7 +877,7 @@ declare module "contract" {
     }
     export const SendMethod = "send";
     export const CallMethod = "call";
-    type MethodType = 'name' | 'symbol' | 'buy' | 'updatePrices' | 'decimals' | 'minAccessLevel' | 'maxAccessLevel' | 'updatePermission' | 'currentAccessLevel' | 'amountToPayForLevel' | 'getBlockAddress' | 'updateBlockAddress' | 'myAccessLevel' | 'hasNoPerm' | 'hasRPerm' | 'hasRWPerm' | 'getPrices' | 'isOwner';
+    type MethodType = 'name' | 'symbol' | 'buy' | 'updatePrices' | 'decimals' | 'minAccessLevel' | 'maxAccessLevel' | 'updatePermission' | 'currentAccessLevel' | 'amountToPayForLevel' | 'getBlockAddress' | 'updateBlockAddress' | 'myAccessLevel' | 'hasNoPerm' | 'hasRPerm' | 'hasRWPerm' | 'getPrices' | 'isOwner' | 'withdraw';
     type ContractMethodValueType = [MethodType, 'call' | 'send'];
     export const ContractMethod: {
         Name: ContractMethodValueType;
@@ -898,6 +898,7 @@ declare module "contract" {
         HasRWPerm: ContractMethodValueType;
         GetPrices: ContractMethodValueType;
         IsOwner: ContractMethodValueType;
+        Withdraw: ContractMethodValueType;
     };
     export default class ShareableStorage {
         static _compiledContract?: ContractInfoType;
@@ -927,6 +928,7 @@ declare module "contract" {
         hasReadWritePerm(account: string): Promise<boolean | Error>;
         isOwner(account: string): Promise<boolean | Error>;
         getPrices(account: string): Promise<string[] | Error>;
+        withdraw(account: string): Promise<unknown | Error>;
         updatePermission(account: string, clientAddress: BlockAddress, level: AccessLevel): Promise<Record<string, unknown> | Error>;
         amountToPayForLevel(account: string, level: AccessLevel): Promise<string | Error>;
         updateBlockAddress(account: string, blockAddress: BlockAddress): Promise<Record<string, unknown> | Error>;

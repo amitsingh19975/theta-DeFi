@@ -53,7 +53,8 @@ exports.ContractMethod = {
     HasRPerm: ['hasRPerm', exports.CallMethod],
     HasRWPerm: ['hasRWPerm', exports.CallMethod],
     GetPrices: ['getPrices', exports.CallMethod],
-    IsOwner: ['isOwner', exports.CallMethod], // function isOwner() public view returns(bool)
+    IsOwner: ['isOwner', exports.CallMethod],
+    Withdraw: ['withdraw', exports.SendMethod], // function withdraw() public onlyOwner hasBalance
 };
 const parseInt = (data) => {
     if (data instanceof Error)
@@ -192,10 +193,12 @@ class ShareableStorage {
     }
     getPrices(account) {
         return __awaiter(this, void 0, void 0, function* () {
-            const errOr = yield this.call(account, exports.ContractMethod.GetPrices);
-            if (errOr instanceof Error)
-                return errOr;
-            return errOr;
+            return yield this.call(account, exports.ContractMethod.GetPrices);
+        });
+    }
+    withdraw(account) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.call(account, exports.ContractMethod.Withdraw);
         });
     }
     updatePermission(account, clientAddress, level) {

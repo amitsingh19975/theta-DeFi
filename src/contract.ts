@@ -56,6 +56,7 @@ type MethodType =
     | 'hasRWPerm'
     | 'getPrices'
     | 'isOwner'
+    | 'withdraw'
 ;
 
 type ContractMethodValueType = [MethodType, 'call' | 'send'];
@@ -79,6 +80,7 @@ export const ContractMethod = {
     HasRWPerm           : ['hasRWPerm', CallMethod ] as ContractMethodValueType,          // function hasRWPerm() public view returns(bool)
     GetPrices           : ['getPrices', CallMethod ] as ContractMethodValueType,          // function getPrices() public view returns(uint[] memory)
     IsOwner             : ['isOwner', CallMethod ] as ContractMethodValueType,            // function isOwner() public view returns(bool)
+    Withdraw            : ['withdraw', SendMethod ] as ContractMethodValueType,            // function withdraw() public onlyOwner hasBalance
 }
 
 const parseInt = (data: unknown) => {
@@ -212,9 +214,11 @@ export default class ShareableStorage {
     }
     
     async getPrices(account: string) : Promise<string[]|Error> {
-        const errOr = await this.call(account, ContractMethod.GetPrices) as string[]|Error;
-        if(errOr instanceof Error) return errOr;
-        return errOr;
+        return await this.call(account, ContractMethod.GetPrices) as string[]|Error;
+    }
+    
+    async withdraw(account: string) : Promise<unknown|Error> {
+        return await this.call(account, ContractMethod.Withdraw) as unknown|Error;
     }
     
     async updatePermission(account: string, clientAddress: BlockAddress, level: AccessLevel) : Promise<Record<string,unknown>|Error> {
