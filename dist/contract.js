@@ -54,7 +54,8 @@ exports.ContractMethod = {
     HasRWPerm: ['hasRWPerm', exports.CallMethod],
     GetPrices: ['getPrices', exports.CallMethod],
     IsOwner: ['isOwner', exports.CallMethod],
-    Withdraw: ['withdraw', exports.SendMethod], // function withdraw() public onlyOwner hasBalance
+    Withdraw: ['withdraw', exports.SendMethod],
+    Balance: ['balance', exports.CallMethod], // function balance() public view onlyOwner returns(uint)
 };
 const parseInt = (data) => {
     if (data instanceof Error)
@@ -159,6 +160,11 @@ class ShareableStorage {
     getBlockAddress(account) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.call(account, exports.ContractMethod.GetBlockAddress);
+        });
+    }
+    contractBalance(account) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.call(account, exports.ContractMethod.Balance);
         });
     }
     currentAccessLevel(account, clientAddress) {

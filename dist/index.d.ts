@@ -877,7 +877,7 @@ declare module "contract" {
     }
     export const SendMethod = "send";
     export const CallMethod = "call";
-    type MethodType = 'name' | 'symbol' | 'buy' | 'updatePrices' | 'decimals' | 'minAccessLevel' | 'maxAccessLevel' | 'updatePermission' | 'currentAccessLevel' | 'amountToPayForLevel' | 'getBlockAddress' | 'updateBlockAddress' | 'myAccessLevel' | 'hasNoPerm' | 'hasRPerm' | 'hasRWPerm' | 'getPrices' | 'isOwner' | 'withdraw';
+    type MethodType = 'name' | 'symbol' | 'buy' | 'updatePrices' | 'decimals' | 'minAccessLevel' | 'maxAccessLevel' | 'updatePermission' | 'currentAccessLevel' | 'amountToPayForLevel' | 'getBlockAddress' | 'updateBlockAddress' | 'myAccessLevel' | 'hasNoPerm' | 'hasRPerm' | 'hasRWPerm' | 'getPrices' | 'isOwner' | 'withdraw' | 'balance';
     type ContractMethodValueType = [MethodType, 'call' | 'send'];
     export const ContractMethod: {
         Name: ContractMethodValueType;
@@ -899,6 +899,7 @@ declare module "contract" {
         GetPrices: ContractMethodValueType;
         IsOwner: ContractMethodValueType;
         Withdraw: ContractMethodValueType;
+        Balance: ContractMethodValueType;
     };
     export default class ShareableStorage {
         static _compiledContract?: ContractInfoType;
@@ -921,6 +922,7 @@ declare module "contract" {
         minAccessLevel(account: string): Promise<AccessLevel | Error>;
         maxAccessLevel(account: string): Promise<AccessLevel | Error>;
         getBlockAddress(account: string): Promise<string | Error>;
+        contractBalance(account: string): Promise<string | Error>;
         currentAccessLevel(account: string, clientAddress?: BlockAddress): Promise<AccessLevel | Error>;
         myAccessLevel(account: string): Promise<AccessLevel | Error>;
         hasNoPerm(account: string): Promise<boolean | Error>;
