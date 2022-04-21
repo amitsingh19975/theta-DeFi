@@ -118,7 +118,7 @@ const main = async () => {
     
     ShareableStorage.init(ThetaLocalnet, compiledContract);
     const file = makeTable('Person', Person, '0xedbebb9620e4cf0206fa7e7ed85a50fa21137b57f83a339a1e3adbe076509a34');
-    await file.init(10 * MAX_BLOCK_SIZE);
+    await file.init(10);
     // console.log(file.makeGraphQLSchema());
     // console.log(JSON.stringify(Directory.root.serialize()));
     const resolver = file.makeGraphQLResolver();
@@ -128,7 +128,7 @@ const main = async () => {
     // await resolver.addRow({input: {name: 'A4', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
     // await resolver.addRow({input: {name: 'A5', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
     // await resolver.addRow({input: {name: 'A6', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
-    // await resolver.addRow({input: {name: 'A9', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
+    await resolver.addRow({input: {name: 'A9', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
     // await resolver.commit();
     file.currentBlocks.forEach((el) => console.log(el.buffer));
     // console.log(await resolver.loadChunk({ start: 0, size: 1 }));

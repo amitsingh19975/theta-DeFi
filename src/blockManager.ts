@@ -15,7 +15,7 @@ export class BlockManager {
     private _tempSize = 0;
     private _shouldShowUpdatingBlock = true;
 
-    private constructor(private readonly contractAddress: BlockAddress, private readonly keys: string[], private _initialAddress: BlockAddress, private numberOfCachedBlocks = MAX_BLOCK_SIZE * 10){
+    private constructor(private readonly contractAddress: BlockAddress, private readonly keys: string[], private _initialAddress: BlockAddress, private numberOfCachedBlocks: number){
         this.lastLoadedAddress = this.initialAddress;
         this._block = new Block(keys, null, 0);
         if(!this.canCommit){
@@ -24,7 +24,7 @@ export class BlockManager {
         }
     }
 
-    static async make(contractAddress: BlockAddress, keys: string[], initialAddress: BlockAddress, numberOfCachedBlocks = MAX_BLOCK_SIZE * 3) : Promise<BlockManager> {
+    static async make(contractAddress: BlockAddress, keys: string[], initialAddress: BlockAddress, numberOfCachedBlocks = 3) : Promise<BlockManager> {
         const temp = new BlockManager(contractAddress, keys, initialAddress, numberOfCachedBlocks);
         await temp.loadChunkFromAddress(temp.initialAddress, 0, temp.numberOfCachedBlocks);
         return temp;
@@ -92,9 +92,10 @@ export class BlockManager {
                         oStart -= 1;
                     }
                 }
+            } else {
+                oEnd -=1;
             }
         }
-
         this._committedBlocks = [];
         this._cachedBlocks.setRange(oStart, oEnd);
 

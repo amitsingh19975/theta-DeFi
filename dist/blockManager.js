@@ -20,7 +20,7 @@ const store_1 = require("./store");
 const object_sizeof_1 = __importDefault(require("object-sizeof"));
 //| 0| 1| 2|...| 1024| <- |1025|....| 2048|
 class BlockManager {
-    constructor(contractAddress, keys, _initialAddress, numberOfCachedBlocks = edgeStore_1.MAX_BLOCK_SIZE * 10) {
+    constructor(contractAddress, keys, _initialAddress, numberOfCachedBlocks) {
         this.contractAddress = contractAddress;
         this.keys = keys;
         this._initialAddress = _initialAddress;
@@ -65,7 +65,7 @@ class BlockManager {
             this.commit = () => __awaiter(this, void 0, void 0, function* () { return false; });
         }
     }
-    static make(contractAddress, keys, initialAddress, numberOfCachedBlocks = edgeStore_1.MAX_BLOCK_SIZE * 3) {
+    static make(contractAddress, keys, initialAddress, numberOfCachedBlocks = 3) {
         return __awaiter(this, void 0, void 0, function* () {
             const temp = new BlockManager(contractAddress, keys, initialAddress, numberOfCachedBlocks);
             yield temp.loadChunkFromAddress(temp.initialAddress, 0, temp.numberOfCachedBlocks);
@@ -129,6 +129,9 @@ class BlockManager {
                             oStart -= 1;
                         }
                     }
+                }
+                else {
+                    oEnd -= 1;
                 }
             }
             this._committedBlocks = [];

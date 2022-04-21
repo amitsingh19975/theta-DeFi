@@ -86,7 +86,7 @@ export default class TableFile extends File {
         }
     }
 
-    async init(numberOfCacheBlocks = MAX_BLOCK_SIZE * 3) : Promise<void> {
+    async init(numberOfCacheBlocks = 3) : Promise<void> {
         this._manager = await BlockManager.make(this.contractAddress, this.keys, this.blockAddress, numberOfCacheBlocks);
     }
 

@@ -35,7 +35,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.buildInputType = exports.buildArgsFromFields = void 0;
 const fileSystem_1 = require("./fileSystem");
 const tableInfo_1 = require("./tableInfo");
-const edgeStore_1 = require("../edgeStore");
 const blockManager_1 = require("../blockManager");
 const graphql_1 = require("graphql");
 const fs_1 = require("../fs");
@@ -76,7 +75,7 @@ class TableFile extends file_1.default {
             return new TableFile(parent, name, tableInfo_1.TableInfo.fromGraphQLSource(fileInfoOrGraphqlSourceCode), blockAddress || null, bufferSize || 0, contractAddress || null);
         }
     }
-    init(numberOfCacheBlocks = edgeStore_1.MAX_BLOCK_SIZE * 3) {
+    init(numberOfCacheBlocks = 3) {
         return __awaiter(this, void 0, void 0, function* () {
             this._manager = yield blockManager_1.BlockManager.make(this.contractAddress, this.keys, this.blockAddress, numberOfCacheBlocks);
         });
