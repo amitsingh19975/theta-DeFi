@@ -548,6 +548,7 @@ declare module "blockManager" {
         private lastLoadedAddress;
         private _committedBlocks;
         private _tempSize;
+        private _shouldShowUpdatingBlock;
         private constructor();
         static make(contractAddress: BlockAddress, keys: string[], initialAddress: BlockAddress, numberOfCachedBlocks?: number): Promise<BlockManager>;
         get canCommit(): boolean;
@@ -560,6 +561,7 @@ declare module "blockManager" {
         private clearCache;
         private skipBlocks;
         loadChunkFromInitialAddress(start: number, size: number): Promise<boolean>;
+        private _loadChunkFromAddressHelper;
         loadChunkFromAddress(address: BlockAddress, start: number, size: number): Promise<boolean>;
         loadNextChunk(): Promise<boolean>;
         loadPrevChunk(): Promise<boolean>;

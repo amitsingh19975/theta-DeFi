@@ -127,9 +127,9 @@ const main = async () => {
     // await resolver.addRow({input: {name: 'A3', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
     // await resolver.addRow({input: {name: 'A4', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
     await resolver.addRow({input: {name: 'A5', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
-    let res = file.currentBlocks;
+    // const res = file.currentBlocks;
     console.log(await resolver.loadChunk({ start: 0, size: 1 }));
-    res.forEach((el) => console.log(el.buffer));
+    // res.forEach((el) => console.log(el.buffer));
     // // await resolver.commit();
     // await resolver.addRow({input: {name: 'A6', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
     // await resolver.addRow({input: {name: 'A7', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});

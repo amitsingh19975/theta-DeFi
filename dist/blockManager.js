@@ -30,6 +30,7 @@ class BlockManager {
         this.lastLoadedAddress = null;
         this._committedBlocks = [];
         this._tempSize = 0;
+        this._shouldShowUpdatingBlock = true;
         this.pushRow = (row, commitIfFull = false, callbackOnCommit) => __awaiter(this, void 0, void 0, function* () {
             if (store_1.Store.push(this._block, row)) {
                 this._tempSize += (0, object_sizeof_1.default)(row);
@@ -115,27 +116,40 @@ class BlockManager {
             if (!address)
                 return false;
             address = yield this.skipBlocks(address, start);
-            return yield this.loadChunkFromAddress(address, start, size);
+            const end = start + size;
+            return yield this._loadChunkFromAddressHelper(address, start, end);
+        });
+    }
+    _loadChunkFromAddressHelper(address, oStart, oEnd) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!address)
+                return false;
+            if (oStart > 0)
+                this._shouldShowUpdatingBlock = false;
+            else {
+                this._shouldShowUpdatingBlock = true;
+                if (!this._block.isEmpty)
+                    oEnd = Math.max(oStart, oEnd - 1);
+            }
+            this._committedBlocks = [];
+            this._cachedBlocks.setRange(oStart, oEnd);
+            let prevAddr = address;
+            while (address && oStart < oEnd) {
+                const block = yield this.loadBlock(address);
+                if (!block)
+                    break;
+                this._cachedBlocks.add(oStart, block, address);
+                prevAddr = address;
+                address = block.next;
+                ++oStart;
+            }
+            this.lastLoadedAddress = prevAddr;
+            return true;
         });
     }
     loadChunkFromAddress(address, start, size) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!address)
-                return false;
-            this._cachedBlocks.setRange(start, start + size);
-            this._committedBlocks = [];
-            let prevAddr = address;
-            while (address && start < size) {
-                const block = yield this.loadBlock(address);
-                if (!block)
-                    break;
-                this._cachedBlocks.add(start, block, address);
-                prevAddr = address;
-                address = block.next;
-                ++start;
-            }
-            this.lastLoadedAddress = prevAddr;
-            return true;
+            return this._loadChunkFromAddressHelper(address, start, start + size);
         });
     }
     loadNextChunk() {
@@ -158,7 +172,7 @@ class BlockManager {
     }
     getBlocks() {
         const res = [];
-        if (!this._block.isEmpty)
+        if (!this._block.isEmpty && this._shouldShowUpdatingBlock)
             res.push(this._block);
         this._committedBlocks.forEach(el => res.push(el));
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -170,7 +184,7 @@ class BlockManager {
     }
     getData() {
         const res = [];
-        if (!this._block.isEmpty) {
+        if (!this._block.isEmpty && this._shouldShowUpdatingBlock) {
             this._flattenBlock(res, this._block);
         }
         this._committedBlocks.forEach(el => this._flattenBlock(res, el));

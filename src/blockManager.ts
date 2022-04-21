@@ -13,6 +13,7 @@ export class BlockManager {
     private lastLoadedAddress: BlockAddress = null;
     private _committedBlocks: Block[] = [];
     private _tempSize = 0;
+    private _shouldShowUpdatingBlock = true;
 
     private constructor(private readonly contractAddress: BlockAddress, private readonly keys: string[], private _initialAddress: BlockAddress, private numberOfCachedBlocks = MAX_BLOCK_SIZE * 10){
         this.lastLoadedAddress = this.initialAddress;
@@ -82,26 +83,38 @@ export class BlockManager {
         if(!address) return false;
 
         address = await this.skipBlocks(address, start);
+        const end = start + size;
 
-        return await this.loadChunkFromAddress(address, start, size);
+        return await this._loadChunkFromAddressHelper(address, start, end);
     }
 
-    async loadChunkFromAddress(address: BlockAddress, start: number, size: number) : Promise<boolean> {
+    private async _loadChunkFromAddressHelper(address: BlockAddress, oStart: number, oEnd: number) : Promise<boolean> {
         if(!address) return false;
 
-        this._cachedBlocks.setRange(start, start + size);
+        if (oStart > 0) this._shouldShowUpdatingBlock = false;
+        else {
+            this._shouldShowUpdatingBlock = true;
+            if (!this._block.isEmpty) oEnd = Math.max(oStart, oEnd - 1);
+        }
+
         this._committedBlocks = [];
+        this._cachedBlocks.setRange(oStart, oEnd);
+
         let prevAddr = address;
-        while(address && start < size){
+        while(address && oStart < oEnd){
             const block: Block| null = await this.loadBlock(address);
             if(!block) break;
-            this._cachedBlocks.add(start, block, address);
+            this._cachedBlocks.add(oStart, block, address);
             prevAddr = address;
             address = block.next;
-            ++start;
+            ++oStart;
         }
         this.lastLoadedAddress = prevAddr;
         return true;
+    }
+
+    async loadChunkFromAddress(address: BlockAddress, start: number, size: number) : Promise<boolean> {
+        return this._loadChunkFromAddressHelper(address, start, start + size);
     }
 
     async loadNextChunk() : Promise<boolean> {
@@ -121,7 +134,7 @@ export class BlockManager {
 
     getBlocks() : Block[] {
         const res = [] as Block[];
-        if(!this._block.isEmpty)
+        if(!this._block.isEmpty && this._shouldShowUpdatingBlock)
             res.push(this._block);
         
         this._committedBlocks.forEach(el => res.push(el));
@@ -136,7 +149,7 @@ export class BlockManager {
 
     getData() : Record<string, unknown>[] {
         const res = [] as Record<string, unknown>[];
-        if(!this._block.isEmpty){
+        if(!this._block.isEmpty && this._shouldShowUpdatingBlock){
             this._flattenBlock(res, this._block);
         }
         
