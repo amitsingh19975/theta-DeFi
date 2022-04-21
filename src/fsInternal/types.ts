@@ -143,6 +143,7 @@ export class BasicType{
         case 'f':
         case '0':
         case 'n':
+        case 'no':
             return false;
         }
         throw new Error(`unable to parse ["${data}"] into bool`);
