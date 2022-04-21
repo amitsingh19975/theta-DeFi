@@ -116,15 +116,14 @@ class BlockManager {
             }
             else {
                 this._shouldShowUpdatingBlock = true;
+                oStart += 1;
                 if (this._block.isEmpty) {
-                    oStart += 1;
                     const block = yield this.loadBlock(address);
                     if (block) {
                         if (block.size !== edgeStore_1.MAX_BLOCK_SIZE) {
                             address = block.next;
                             this._block = block;
                             this._block.isCommited = false;
-                            this._initialAddress = address;
                         }
                         else {
                             oStart -= 1;

@@ -81,15 +81,14 @@ export class BlockManager {
             this._shouldShowUpdatingBlock = false;
         }else {
             this._shouldShowUpdatingBlock = true;
+            oStart += 1;
             if (this._block.isEmpty) {
-                oStart += 1;
                 const block = await this.loadBlock(address);
                 if ( block ) {
                     if (block.size !== MAX_BLOCK_SIZE) {
                         address = block.next;
                         this._block = block;
                         this._block.isCommited = false;
-                        this._initialAddress = address;
                     } else {
                         oStart -= 1;
                     }
