@@ -249,7 +249,7 @@ export default class TableFile extends File {
             if(!manager) throw new Error('[Table]: block manager is not initialized');
             
             if (this._callbackBefore) this._callbackBefore({funcName: 'loadChunk', args: { start, size }, type: 'Query'});
-
+            
             await manager.loadChunkFromInitialAddress(start, size);
 
             if (this._callbackAfter) this._callbackAfter({funcName: 'loadChunk', args: { start, size }, type: 'Query'});

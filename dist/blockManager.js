@@ -111,8 +111,9 @@ class BlockManager {
         return __awaiter(this, void 0, void 0, function* () {
             if (!address)
                 return false;
-            if (oStart > 0)
+            if (oStart > 0) {
                 this._shouldShowUpdatingBlock = false;
+            }
             else {
                 this._shouldShowUpdatingBlock = true;
                 if (this._block.isEmpty) {
@@ -122,7 +123,6 @@ class BlockManager {
                         if (block.size !== edgeStore_1.MAX_BLOCK_SIZE) {
                             address = block.next;
                             this._block = block;
-                            this._initialAddress = address;
                             this._block.isCommited = false;
                         }
                         else {
@@ -134,6 +134,7 @@ class BlockManager {
                     oEnd -= 1;
                 }
             }
+            console.log(oStart, oEnd);
             this._committedBlocks = [];
             this._cachedBlocks.setRange(oStart, oEnd);
             let prevAddr = address;

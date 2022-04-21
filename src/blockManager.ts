@@ -68,6 +68,7 @@ export class BlockManager {
         if(!address) return false;
 
         address = await this.skipBlocks(address, start);
+
         const end = start + size;
 
         return await this._loadChunkFromAddressHelper(address, start, end);
@@ -76,8 +77,9 @@ export class BlockManager {
     private async _loadChunkFromAddressHelper(address: BlockAddress, oStart: number, oEnd: number) : Promise<boolean> {
         if(!address) return false;
 
-        if (oStart > 0) this._shouldShowUpdatingBlock = false;
-        else {
+        if (oStart > 0) {
+            this._shouldShowUpdatingBlock = false;
+        }else {
             this._shouldShowUpdatingBlock = true;
             if (this._block.isEmpty) {
                 oStart += 1;
@@ -86,7 +88,6 @@ export class BlockManager {
                     if (block.size !== MAX_BLOCK_SIZE) {
                         address = block.next;
                         this._block = block;
-                        this._initialAddress = address;
                         this._block.isCommited = false;
                     } else {
                         oStart -= 1;
@@ -96,6 +97,9 @@ export class BlockManager {
                 oEnd -=1;
             }
         }
+
+        console.log(oStart, oEnd);
+
         this._committedBlocks = [];
         this._cachedBlocks.setRange(oStart, oEnd);
 

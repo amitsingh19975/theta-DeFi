@@ -117,7 +117,7 @@ const main = async () => {
     `;
     
     ShareableStorage.init(ThetaLocalnet, compiledContract);
-    const file = makeTable('Person', Person, '0xedbebb9620e4cf0206fa7e7ed85a50fa21137b57f83a339a1e3adbe076509a34');
+    const file = makeTable('Person', Person, '0xe1b4b4d392d9180ac1416ae987789730b0cb753aae7028f51e9e2f02001f1788');
     await file.init(10);
     // console.log(file.makeGraphQLSchema());
     // console.log(JSON.stringify(Directory.root.serialize()));
@@ -128,10 +128,11 @@ const main = async () => {
     // await resolver.addRow({input: {name: 'A4', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
     // await resolver.addRow({input: {name: 'A5', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
     // await resolver.addRow({input: {name: 'A6', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
-    await resolver.addRow({input: {name: 'A9', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
+    // await resolver.addRow({input: {name: 'A9', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
     // await resolver.commit();
     file.currentBlocks.forEach((el) => console.log(el.buffer));
-    // console.log(await resolver.loadChunk({ start: 0, size: 1 }));
+    console.log('HERER');
+    console.log(await resolver.loadChunk({ start: 0, size: 1 }));
     // // await resolver.commit();
     // await resolver.addRow({input: {name: 'A6', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
     // await resolver.addRow({input: {name: 'A7', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
