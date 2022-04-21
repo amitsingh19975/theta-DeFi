@@ -89,6 +89,7 @@ export class BlockManager {
                         address = block.next;
                         this._block = block;
                         this._block.isCommited = false;
+                        this._initialAddress = address;
                     } else {
                         oStart -= 1;
                     }
@@ -98,7 +99,6 @@ export class BlockManager {
             }
         }
 
-        console.log(oStart, oEnd);
 
         this._committedBlocks = [];
         this._cachedBlocks.setRange(oStart, oEnd);
