@@ -1,6 +1,6 @@
 const win = globalThis as unknown as WindowType;
 
-win['IS_LOCAL'] = false;
+win['IS_LOCAL'] = true;
 // // 4[3[2[1Int]!]]!
 // const temp = Int([true, false, true, false], 3);
 // console.log(temp.toString());
@@ -100,7 +100,7 @@ import ShareableStorage, { AccessLevel, toWei } from "./contract";
 import AccountManager from "./accountManager";
 import fs from 'fs';
 import config from './solcConfig';
-import { ThetaMainnet, URLS, WindowType } from './edgeStore';
+import { ThetaLocalnet, ThetaMainnet, URLS, WindowType } from './edgeStore';
 import { deserializeFileSystem, Directory, makeTable } from './fs';
 import { graphql } from 'graphql';
 import { Bool, Float, Int, Str } from './fsInternal/types';
@@ -116,22 +116,20 @@ const main = async () => {
       }
     `;
     
-    ShareableStorage.init(ThetaMainnet, compiledContract);
-    // const file = makeTable('Person', Person);
-    // await file.init();
+    ShareableStorage.init(ThetaLocalnet, compiledContract);
+    const file = makeTable('Person', Person, '0xc4ff12164e6f0072a247417a8b64b30c75aac0d602c229f9f67efb0e56c154cd');
+    await file.init();
     // console.log(file.makeGraphQLSchema());
     // console.log(JSON.stringify(Directory.root.serialize()));
-    // const resolver = file.makeGraphQLResolver();
+    const resolver = file.makeGraphQLResolver();
     // await resolver.addRow({input: {name: 'A1', phone: 123123, salary: 123.3, city: 'Lucknow', country: 'India'}});
-    // console.log(file.approxSize);
     // await resolver.addRow({input: {name: 'A2', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
-    // console.log(file.approxSize);
     // await resolver.addRow({input: {name: 'A3', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
-    // console.log(file.approxSize);
     // await resolver.addRow({input: {name: 'A4', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
-    // console.log(file.approxSize);
-    // await resolver.addRow({input: {name: 'A5', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
-    // console.log(file.approxSize);
+    await resolver.addRow({input: {name: 'A5', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
+    let res = file.currentBlocks;
+    console.log(await resolver.loadChunk({ start: 0, size: 1 }));
+    res.forEach((el) => console.log(el.buffer));
     // // await resolver.commit();
     // await resolver.addRow({input: {name: 'A6', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
     // await resolver.addRow({input: {name: 'A7', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
@@ -159,10 +157,10 @@ const main = async () => {
     // const web = ShareableStorage._web;
     // if (!web) return;
     // console.log(await web.eth.net.isListening());
-    const account = '0x19E7E376E7C213B7E7e7e46cc70A5dD086DAff2A';
-    const web = ShareableStorage._web;
-    if (!web) return;
-    console.log(await web.eth.getAccounts());
+    // const account = '0x19E7E376E7C213B7E7e7e46cc70A5dD086DAff2A';
+    // const web = ShareableStorage._web;
+    // if (!web) return;
+    // console.log(await web.eth.getAccounts());
     
     // // await crt.deploy({
     // //     name: 'Testing',

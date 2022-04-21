@@ -23,7 +23,7 @@ export class BlockManager {
         }
     }
 
-    static async make(contractAddress: BlockAddress, keys: string[], initialAddress: BlockAddress, numberOfCachedBlocks = MAX_BLOCK_SIZE * 10) : Promise<BlockManager> {
+    static async make(contractAddress: BlockAddress, keys: string[], initialAddress: BlockAddress, numberOfCachedBlocks = MAX_BLOCK_SIZE * 3) : Promise<BlockManager> {
         const temp = new BlockManager(contractAddress, keys, initialAddress, numberOfCachedBlocks);
 
         await temp.loadChunkFromAddress(temp.initialAddress, 0, temp.numberOfCachedBlocks);
@@ -67,13 +67,10 @@ export class BlockManager {
     }
 
     private async skipBlocks(address: BlockAddress, blocksToSkip: number) : Promise<BlockAddress> {
-        let i = 0;
-
-        while(address && i < blocksToSkip){
+        while(address && blocksToSkip--){
             const block: Block| null = await this.loadBlock(address);
             if(!block) break;
             address = block.next;
-            ++i;
         }
 
         return address;
@@ -95,7 +92,7 @@ export class BlockManager {
         this._cachedBlocks.setRange(start, start + size);
         this._committedBlocks = [];
         let prevAddr = address;
-        while(address){
+        while(address && start < size){
             const block: Block| null = await this.loadBlock(address);
             if(!block) break;
             this._cachedBlocks.add(start, block, address);

@@ -64,7 +64,7 @@ class BlockManager {
             this.commit = () => __awaiter(this, void 0, void 0, function* () { return false; });
         }
     }
-    static make(contractAddress, keys, initialAddress, numberOfCachedBlocks = edgeStore_1.MAX_BLOCK_SIZE * 10) {
+    static make(contractAddress, keys, initialAddress, numberOfCachedBlocks = edgeStore_1.MAX_BLOCK_SIZE * 3) {
         return __awaiter(this, void 0, void 0, function* () {
             const temp = new BlockManager(contractAddress, keys, initialAddress, numberOfCachedBlocks);
             yield temp.loadChunkFromAddress(temp.initialAddress, 0, temp.numberOfCachedBlocks);
@@ -100,13 +100,11 @@ class BlockManager {
     }
     skipBlocks(address, blocksToSkip) {
         return __awaiter(this, void 0, void 0, function* () {
-            let i = 0;
-            while (address && i < blocksToSkip) {
+            while (address && blocksToSkip--) {
                 const block = yield this.loadBlock(address);
                 if (!block)
                     break;
                 address = block.next;
-                ++i;
             }
             return address;
         });
@@ -127,7 +125,7 @@ class BlockManager {
             this._cachedBlocks.setRange(start, start + size);
             this._committedBlocks = [];
             let prevAddr = address;
-            while (address) {
+            while (address && start < size) {
                 const block = yield this.loadBlock(address);
                 if (!block)
                     break;

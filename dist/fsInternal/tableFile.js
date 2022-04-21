@@ -76,12 +76,13 @@ class TableFile extends file_1.default {
             return new TableFile(parent, name, tableInfo_1.TableInfo.fromGraphQLSource(fileInfoOrGraphqlSourceCode), blockAddress || null, bufferSize || 0, contractAddress || null);
         }
     }
-    init() {
+    init(numberOfCacheBlocks = edgeStore_1.MAX_BLOCK_SIZE * 3) {
         return __awaiter(this, void 0, void 0, function* () {
-            this._manager = yield blockManager_1.BlockManager.make(this.contractAddress, this.keys, this.blockAddress);
+            this._manager = yield blockManager_1.BlockManager.make(this.contractAddress, this.keys, this.blockAddress, numberOfCacheBlocks);
         });
     }
-    setCallback(callback) { this._callback = callback; }
+    setCallbackAfter(callback) { this._callbackAfter = callback; }
+    setCallbackBefore(callback) { this._callbackBefore = callback; }
     setCommittedCallback(callback) { this._committedCallback = callback; }
     get approxSize() { var _a; return this._size + (((_a = this._manager) === null || _a === void 0 ? void 0 : _a.tempSize) || 0); }
     get tableInfo() { return this._tableInfo; }
@@ -117,9 +118,11 @@ class TableFile extends file_1.default {
             const manager = this._manager;
             if (!manager)
                 throw new Error('[Table]: block manager is not initialized');
+            if (this._callbackBefore)
+                this._callbackBefore({ funcName: 'addRow', args: args['input'], type: 'Mutation' });
             yield this._pushRow(manager, input);
-            if (this._callback)
-                this._callback({ funcName: 'addRow', args: args['input'], type: 'Mutation' });
+            if (this._callbackAfter)
+                this._callbackAfter({ funcName: 'addRow', args: args['input'], type: 'Mutation' });
             return true;
         });
         resolver['addRows'] = (args) => __awaiter(this, void 0, void 0, function* () {
@@ -135,26 +138,30 @@ class TableFile extends file_1.default {
             const manager = this._manager;
             if (!manager)
                 throw new Error('[Table]: block manager is not initialized');
+            if (this._callbackBefore)
+                this._callbackBefore({ funcName: 'addRows', args: inputs, type: 'Mutation' });
             for (let i = 0; i < inputs.length; i += 1) {
                 const el = inputs[i];
                 yield this._pushRow(manager, el);
             }
-            if (this._callback)
-                this._callback({ funcName: 'addRows', args: inputs, type: 'Mutation' });
+            if (this._callbackAfter)
+                this._callbackAfter({ funcName: 'addRows', args: inputs, type: 'Mutation' });
             return true;
         });
         resolver['commit'] = () => __awaiter(this, void 0, void 0, function* () {
             const manager = this._manager;
             if (!manager)
                 throw new Error('[Table]: block manager is not initialized');
+            if (this._callbackBefore)
+                this._callbackBefore({ funcName: 'commit', type: 'Mutation' });
             const res = yield manager.commit(() => {
                 var _a;
                 this._size += ((_a = this._manager) === null || _a === void 0 ? void 0 : _a.tempSize) || 0;
                 if (this._committedCallback)
                     this._committedCallback();
             });
-            if (this._callback)
-                this._callback({ funcName: 'commit', type: 'Mutation' });
+            if (this._callbackAfter)
+                this._callbackAfter({ funcName: 'commit', type: 'Mutation' });
             this._initialBlockAddress = manager.initialAddress ? manager.initialAddress : this._initialBlockAddress;
             this._height = manager.height;
             return res;
@@ -193,31 +200,39 @@ class TableFile extends file_1.default {
             const manager = this._manager;
             if (!manager)
                 throw new Error('[Table]: block manager is not initialized');
-            if (this._callback)
-                this._callback({ funcName: 'show', type: 'Query' });
-            return mapBlocks(manager.getBlocks());
+            if (this._callbackBefore)
+                this._callbackBefore({ funcName: 'show', type: 'Query' });
+            const res = mapBlocks(manager.getBlocks());
+            if (this._callbackAfter)
+                this._callbackAfter({ funcName: 'show', type: 'Query' });
+            return res;
         };
         resolver['loadChunk'] = (args) => __awaiter(this, void 0, void 0, function* () {
             if (!args)
                 throw new Error('[resolver] => arguments are undefined!');
             let start = 0;
-            let end = edgeStore_1.MAX_BLOCK_SIZE;
+            let size = 1;
             if ('start' in args)
                 start = args['start'];
-            if ('end' in args)
-                end = args['end'];
+            if ('size' in args)
+                size = args['size'];
             const manager = this._manager;
             if (!manager)
                 throw new Error('[Table]: block manager is not initialized');
-            yield manager.loadChunkFromInitialAddress(start, end);
-            if (this._callback)
-                this._callback({ funcName: 'loadChunk', type: 'Query' });
+            if (this._callbackBefore)
+                this._callbackBefore({ funcName: 'loadChunk', args: { start, size }, type: 'Query' });
+            yield manager.loadChunkFromInitialAddress(start, size);
+            if (this._callbackAfter)
+                this._callbackAfter({ funcName: 'loadChunk', args: { start, size }, type: 'Query' });
             return mapBlocks(manager.getBlocks());
         });
         resolver['info'] = () => {
-            if (this._callback)
-                this._callback({ funcName: 'info', type: 'Query' });
-            return this.getInfo();
+            if (this._callbackBefore)
+                this._callbackBefore({ funcName: 'info', type: 'Query' });
+            const res = this.getInfo();
+            if (this._callbackAfter)
+                this._callbackAfter({ funcName: 'info', type: 'Query' });
+            return res;
         };
         this.makeGraphQLMutationResolver(resolver);
         return resolver;
@@ -253,7 +268,7 @@ class TableFile extends file_1.default {
 
             type Query {
                 info : Info
-                loadChunk(start: Int, end: Int): [${this.tableName}]
+                loadChunk(start: Int, size: Int): [${this.tableName}]
                 show : [${this.tableName}]
             }
         `);

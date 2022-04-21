@@ -658,12 +658,14 @@ declare module "fsInternal/tableFile" {
         private _tableInfo;
         private _height;
         private _manager?;
-        _callback?: GraphQLExecCallbackType;
+        _callbackAfter?: GraphQLExecCallbackType;
+        _callbackBefore?: GraphQLExecCallbackType;
         _committedCallback?: () => void;
         private constructor();
         static make(parent: Directory | null, name: string, fileInfoOrGraphqlSourceCode: TableInfo | string, blockAddress?: BlockAddress, bufferSize?: number, contractAddress?: BlockAddress): TableFile;
-        init(): Promise<void>;
-        setCallback(callback: GraphQLExecCallbackType): void;
+        init(numberOfCacheBlocks?: number): Promise<void>;
+        setCallbackAfter(callback: GraphQLExecCallbackType): void;
+        setCallbackBefore(callback: GraphQLExecCallbackType): void;
         setCommittedCallback(callback: () => void): void;
         get approxSize(): number;
         get tableInfo(): TableInfo;
@@ -693,7 +695,7 @@ declare module "edgeStore" {
     export const ThetaMainnet: ChainType;
     export const ThetaTestnet: ChainType;
     export const ThetaLocalnet: ChainType;
-    export const MAX_BLOCK_SIZE = 1024;
+    export const MAX_BLOCK_SIZE = 2;
     export type EdgeStoreConfigType = {
         protocol?: string;
         domain?: string;

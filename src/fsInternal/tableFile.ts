@@ -68,7 +68,8 @@ export default class TableFile extends File {
     private _tableInfo : TableInfo;
     private _height = 0;
     private _manager? : BlockManager;
-    _callback?: GraphQLExecCallbackType;
+    _callbackAfter?: GraphQLExecCallbackType;
+    _callbackBefore?: GraphQLExecCallbackType;
     _committedCallback?: () => void;
 
     private constructor(parent: Directory | null, name: string, fileInfo: TableInfo, blockAddress: BlockAddress, bufferSize: number, contractAddress: BlockAddress) {
@@ -85,11 +86,12 @@ export default class TableFile extends File {
         }
     }
 
-    async init() : Promise<void> {
-        this._manager = await BlockManager.make(this.contractAddress, this.keys, this.blockAddress);
+    async init(numberOfCacheBlocks = MAX_BLOCK_SIZE * 3) : Promise<void> {
+        this._manager = await BlockManager.make(this.contractAddress, this.keys, this.blockAddress, numberOfCacheBlocks);
     }
 
-    setCallback(callback: GraphQLExecCallbackType) : void { this._callback = callback; }
+    setCallbackAfter(callback: GraphQLExecCallbackType) : void { this._callbackAfter = callback; }
+    setCallbackBefore(callback: GraphQLExecCallbackType) : void { this._callbackBefore = callback; }
     setCommittedCallback(callback: () => void) : void { this._committedCallback = callback; }
 
     get approxSize() : number { return this._size + (this._manager?.tempSize || 0); }
@@ -129,10 +131,11 @@ export default class TableFile extends File {
             const manager = this._manager;
             if(!manager) throw new Error('[Table]: block manager is not initialized');
 
+            if (this._callbackBefore) this._callbackBefore({funcName: 'addRow', args: args['input'], type: 'Mutation'});
 
             await this._pushRow(manager, input);
 
-            if (this._callback) this._callback({funcName: 'addRow', args: args['input'], type: 'Mutation'});
+            if (this._callbackAfter) this._callbackAfter({funcName: 'addRow', args: args['input'], type: 'Mutation'});
 
             return true;
         }
@@ -153,12 +156,14 @@ export default class TableFile extends File {
             const manager = this._manager;
             if(!manager) throw new Error('[Table]: block manager is not initialized');
 
+            if (this._callbackBefore) this._callbackBefore({funcName: 'addRows', args: inputs, type: 'Mutation'});
+
             for (let i = 0; i < inputs.length; i += 1) {
                 const el = inputs[i];
                 await this._pushRow(manager, el);
             }
 
-            if (this._callback) this._callback({funcName: 'addRows', args: inputs, type: 'Mutation'});
+            if (this._callbackAfter) this._callbackAfter({funcName: 'addRows', args: inputs, type: 'Mutation'});
 
             return true;
 
@@ -168,12 +173,14 @@ export default class TableFile extends File {
             const manager = this._manager;
             if(!manager) throw new Error('[Table]: block manager is not initialized');
 
+            if (this._callbackBefore) this._callbackBefore({funcName: 'commit', type: 'Mutation'});
+
             const res = await manager.commit(() => {
                 this._size += this._manager?.tempSize || 0
                 if (this._committedCallback) this._committedCallback();
             });
             
-            if (this._callback) this._callback({funcName: 'commit', type: 'Mutation'});
+            if (this._callbackAfter) this._callbackAfter({funcName: 'commit', type: 'Mutation'});
 
             this._initialBlockAddress = manager.initialAddress ? manager.initialAddress : this._initialBlockAddress;
             this._height = manager.height;
@@ -219,34 +226,45 @@ export default class TableFile extends File {
         resolver['show'] = () => {
             const manager = this._manager;
             if(!manager) throw new Error('[Table]: block manager is not initialized');
+            
+            if (this._callbackBefore) this._callbackBefore({funcName: 'show', type: 'Query'});
 
-            if (this._callback) this._callback({funcName: 'show', type: 'Query'});
+            const res = mapBlocks(manager.getBlocks());
 
-            return mapBlocks(manager.getBlocks());
+            if (this._callbackAfter) this._callbackAfter({funcName: 'show', type: 'Query'});
+
+            return res;
         }
 
         resolver['loadChunk'] = async (args) => {
             if(!args) throw new Error('[resolver] => arguments are undefined!');
             
             let start = 0;
-            let end = MAX_BLOCK_SIZE;
+            let size = 1;
 
             if('start' in args) start = args['start'] as number;
             
-            if('end' in args) end = args['end'] as number;
+            if('size' in args) size = args['size'] as number;
             const manager = this._manager;
             if(!manager) throw new Error('[Table]: block manager is not initialized');
+            
+            if (this._callbackBefore) this._callbackBefore({funcName: 'loadChunk', args: { start, size }, type: 'Query'});
 
-            await manager.loadChunkFromInitialAddress(start, end);
+            await manager.loadChunkFromInitialAddress(start, size);
 
-            if (this._callback) this._callback({funcName: 'loadChunk', type: 'Query'});
+            if (this._callbackAfter) this._callbackAfter({funcName: 'loadChunk', args: { start, size }, type: 'Query'});
 
             return mapBlocks(manager.getBlocks());
         }
 
         resolver['info'] = () => {
-            if (this._callback) this._callback({funcName: 'info', type: 'Query'});
-            return this.getInfo();
+            if (this._callbackBefore) this._callbackBefore({funcName: 'info', type: 'Query'});
+            
+            const res = this.getInfo();
+            
+            if (this._callbackAfter) this._callbackAfter({funcName: 'info', type: 'Query'});
+
+            return res;
         };
 
         this.makeGraphQLMutationResolver(resolver);
@@ -284,7 +302,7 @@ export default class TableFile extends File {
 
             type Query {
                 info : Info
-                loadChunk(start: Int, end: Int): [${this.tableName}]
+                loadChunk(start: Int, size: Int): [${this.tableName}]
                 show : [${this.tableName}]
             }
         `);
