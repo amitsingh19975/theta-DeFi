@@ -240,7 +240,7 @@ export default class TableFile extends File {
             if(!args) throw new Error('[resolver] => arguments are undefined!');
             
             let start = 0;
-            let size = 1;
+            let size = Number.MAX_VALUE;
 
             if('start' in args) start = args['start'] as number;
             
