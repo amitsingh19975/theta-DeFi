@@ -120,10 +120,13 @@ class BasicType {
             case 'true':
             case 't':
             case '1':
+            case 'yes':
+            case 'y':
                 return true;
             case 'false':
             case 'f':
             case '0':
+            case 'n':
                 return false;
         }
         throw new Error(`unable to parse ["${data}"] into bool`);

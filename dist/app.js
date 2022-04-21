@@ -18,7 +18,6 @@ const contract_1 = __importDefault(require("./contract"));
 const fs_1 = __importDefault(require("fs"));
 const solcConfig_1 = __importDefault(require("./solcConfig"));
 const edgeStore_1 = require("./edgeStore");
-const web3_utils_1 = require("web3-utils");
 const compiledContract = JSON.parse(fs_1.default.readFileSync(solcConfig_1.default.contracts.cache).toString());
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const Person = `
@@ -27,7 +26,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         phone: Int!
       }
     `;
-    contract_1.default.init(edgeStore_1.URLS.thetanet, compiledContract);
+    contract_1.default.init(edgeStore_1.ThetaMainnet, compiledContract);
     // const file = makeTable('Person', Person);
     // await file.init();
     // console.log(file.makeGraphQLSchema());
@@ -72,7 +71,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const web = contract_1.default._web;
     if (!web)
         return;
-    console.log((0, web3_utils_1.fromWei)(yield web.eth.getBalance(account)));
+    console.log(yield web.eth.getAccounts());
     // // await crt.deploy({
     // //     name: 'Testing',
     // //     blockAddress: '0x123123adfa1',

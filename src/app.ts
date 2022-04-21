@@ -100,7 +100,7 @@ import ShareableStorage, { AccessLevel, toWei } from "./contract";
 import AccountManager from "./accountManager";
 import fs from 'fs';
 import config from './solcConfig';
-import { URLS, WindowType } from './edgeStore';
+import { ThetaMainnet, URLS, WindowType } from './edgeStore';
 import { deserializeFileSystem, Directory, makeTable } from './fs';
 import { graphql } from 'graphql';
 import { Bool, Float, Int, Str } from './fsInternal/types';
@@ -116,7 +116,7 @@ const main = async () => {
       }
     `;
     
-    ShareableStorage.init(URLS.thetanet, compiledContract);
+    ShareableStorage.init(ThetaMainnet, compiledContract);
     // const file = makeTable('Person', Person);
     // await file.init();
     // console.log(file.makeGraphQLSchema());
@@ -162,7 +162,7 @@ const main = async () => {
     const account = '0x19E7E376E7C213B7E7e7e46cc70A5dD086DAff2A';
     const web = ShareableStorage._web;
     if (!web) return;
-    console.log(fromWei(await web.eth.getBalance(account)));
+    console.log(await web.eth.getAccounts());
     
     // // await crt.deploy({
     // //     name: 'Testing',
