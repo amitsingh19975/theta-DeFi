@@ -119,8 +119,9 @@ export class BasicType{
         return data;
     }
 
-    private _parseNumber(data: string): number {
+    private _parseNumber(data: string): number|null {
         const num = Number.parseInt(data);
+        if (data.trim().length === 0) return null;
         if(this.isInt) {
             if(Number.isInteger(num)) return num;
             throw new Error(`unable to parse string[${data}] in "Int"`);
@@ -130,7 +131,8 @@ export class BasicType{
         throw new Error(`unable to parse string[${data}] in "Float" because we found NaN, while parsing`);
     }
 
-    private _parseBool(data: string): boolean {
+    private _parseBool(data: string): boolean|null {
+        if (data.trim().length === 0) return null;
         const temp = data.toLowerCase();
         switch(temp){
         case 'true': 

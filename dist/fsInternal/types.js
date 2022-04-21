@@ -104,6 +104,8 @@ class BasicType {
     }
     _parseNumber(data) {
         const num = Number.parseInt(data);
+        if (data.trim().length === 0)
+            return null;
         if (this.isInt) {
             if (Number.isInteger(num))
                 return num;
@@ -115,6 +117,8 @@ class BasicType {
         throw new Error(`unable to parse string[${data}] in "Float" because we found NaN, while parsing`);
     }
     _parseBool(data) {
+        if (data.trim().length === 0)
+            return null;
         const temp = data.toLowerCase();
         switch (temp) {
             case 'true':
