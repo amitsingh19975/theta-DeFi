@@ -28,7 +28,7 @@ exports.ThetaLocalnet = {
     url: 'http://127.0.0.1:18888/rpc',
     chainID: 366,
 };
-exports.MAX_BLOCK_SIZE = 2;
+exports.MAX_BLOCK_SIZE = 1024;
 exports.EdgeStoreConfig = {
     protocol: ('protocol' in config_json_1.default ? config_json_1.default.protocol : 'https://'),
     domain: ('domain' in config_json_1.default ? config_json_1.default.domain : 'localhost'),
