@@ -99,7 +99,7 @@ class BasicType {
             throw new Error(`[Invalid Type] expected "${this.toStr()}", but found "${getCorrectType(data)}"`);
         }
         if (this.isInt)
-            throw new Error(`[Invalid Type] expected "Int", but got "Float"`);
+            throw new Error(`[Invalid Type] expected "Int", but got "Float"[${data}]`);
         return data;
     }
     _parseNumber(data) {
@@ -107,12 +107,12 @@ class BasicType {
         if (this.isInt) {
             if (Number.isInteger(num))
                 return num;
-            throw new Error('unable to parse string in "Int"');
+            throw new Error(`unable to parse string[${data}] in "Int"`);
         }
         const float = Number.parseFloat(data);
         if (this.isFloat && !Number.isNaN(float))
             return float;
-        throw new Error('unable to parse string in "Float" because we found NaN, while parsing');
+        throw new Error(`unable to parse string[${data}] in "Float" because we found NaN, while parsing`);
     }
     _parseBool(data) {
         const temp = data.toLowerCase();
@@ -146,7 +146,7 @@ class BasicType {
             if (typeof data === 'boolean' && this.isBool)
                 return data;
             if (!this.checkConstraints(temp))
-                throw new Error(`[Invalid Type] expected "${this.toStr()}", but found "${getCorrectType(temp)}"`);
+                throw new Error(`[Invalid Type] expected "${this.toStr()}", but found "${getCorrectType(temp)}[${data}]"`);
         }
         else {
             if (this.isStr)
@@ -155,7 +155,7 @@ class BasicType {
                 return this._parseBool(data);
             if (this.isInt || this.isFloat)
                 return this._parseNumber(data);
-            throw new Error('unknown type found (right now, we are only able to parse basic types, such as Number, String, and Boolean)');
+            throw new Error('unknown type found[${data}] (right now, we are only able to parse basic types, such as Number, String, and Boolean)');
         }
         return data;
     }
