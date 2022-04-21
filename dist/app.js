@@ -28,8 +28,8 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
       }
     `;
     contract_1.default.init(edgeStore_1.ThetaLocalnet, compiledContract);
-    const file = (0, fs_2.makeTable)('Person', Person, '0xc4ff12164e6f0072a247417a8b64b30c75aac0d602c229f9f67efb0e56c154cd');
-    yield file.init();
+    const file = (0, fs_2.makeTable)('Person', Person, '0x608300216b7ecb5e610d795a96bfca9fe39b1252af4f32327b3c8412f352ed86');
+    yield file.init(10 * edgeStore_1.MAX_BLOCK_SIZE);
     // console.log(file.makeGraphQLSchema());
     // console.log(JSON.stringify(Directory.root.serialize()));
     const resolver = file.makeGraphQLResolver();
@@ -37,9 +37,12 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     // await resolver.addRow({input: {name: 'A2', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
     // await resolver.addRow({input: {name: 'A3', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
     // await resolver.addRow({input: {name: 'A4', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
-    yield resolver.addRow({ input: { name: 'A5', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India' } });
+    // await resolver.addRow({input: {name: 'A5', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
+    // await resolver.addRow({input: {name: 'A6', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
+    // await resolver.addRow({input: {name: 'A7', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});
+    // await resolver.commit();
+    console.log(yield resolver.loadChunk({ start: 0, size: 3 }));
     // const res = file.currentBlocks;
-    console.log(yield resolver.loadChunk({ start: 0, size: 1 }));
     // res.forEach((el) => console.log(el.buffer));
     // // await resolver.commit();
     // await resolver.addRow({input: {name: 'A6', phone: 123123, salary: 123.2, city: 'Lucknow', country: 'India'}});

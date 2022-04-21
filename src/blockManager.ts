@@ -26,22 +26,7 @@ export class BlockManager {
 
     static async make(contractAddress: BlockAddress, keys: string[], initialAddress: BlockAddress, numberOfCachedBlocks = MAX_BLOCK_SIZE * 3) : Promise<BlockManager> {
         const temp = new BlockManager(contractAddress, keys, initialAddress, numberOfCachedBlocks);
-
         await temp.loadChunkFromAddress(temp.initialAddress, 0, temp.numberOfCachedBlocks);
-
-        const initBlock = temp.findInCachedBlock(temp.initialAddress);
-        if(initBlock){
-            if(initBlock.size !== MAX_BLOCK_SIZE){
-                initBlock.isCommited = false;
-                temp._block = initBlock;
-                temp._cachedBlocks.delete(temp.initialAddress);
-            }else{
-                const next = temp.initialAddress;
-                const height = initBlock.height + 1;
-                temp._block = new Block(temp.keys, next, height);
-            }
-        }
-
         return temp;
     }
 
@@ -94,7 +79,18 @@ export class BlockManager {
         if (oStart > 0) this._shouldShowUpdatingBlock = false;
         else {
             this._shouldShowUpdatingBlock = true;
-            if (!this._block.isEmpty) oEnd = Math.max(oStart, oEnd - 1);
+            if (this._block.isEmpty) {
+                oStart += 1;
+                const block = await this.loadBlock(address);
+                if ( block ) {
+                    if (block.size !== MAX_BLOCK_SIZE) {
+                        address = block.next;
+                        this._block = block;
+                    } else {
+                        oStart -= 1;
+                    }
+                }
+            }
         }
 
         this._committedBlocks = [];
@@ -134,8 +130,9 @@ export class BlockManager {
 
     getBlocks() : Block[] {
         const res = [] as Block[];
-        if(!this._block.isEmpty && this._shouldShowUpdatingBlock)
+        if(!this._block.isEmpty && this._shouldShowUpdatingBlock) {
             res.push(this._block);
+        }
         
         this._committedBlocks.forEach(el => res.push(el));
         // eslint-disable-next-line @typescript-eslint/no-unused-vars

@@ -69,19 +69,6 @@ class BlockManager {
         return __awaiter(this, void 0, void 0, function* () {
             const temp = new BlockManager(contractAddress, keys, initialAddress, numberOfCachedBlocks);
             yield temp.loadChunkFromAddress(temp.initialAddress, 0, temp.numberOfCachedBlocks);
-            const initBlock = temp.findInCachedBlock(temp.initialAddress);
-            if (initBlock) {
-                if (initBlock.size !== edgeStore_1.MAX_BLOCK_SIZE) {
-                    initBlock.isCommited = false;
-                    temp._block = initBlock;
-                    temp._cachedBlocks.delete(temp.initialAddress);
-                }
-                else {
-                    const next = temp.initialAddress;
-                    const height = initBlock.height + 1;
-                    temp._block = new block_1.Block(temp.keys, next, height);
-                }
-            }
             return temp;
         });
     }
@@ -128,8 +115,19 @@ class BlockManager {
                 this._shouldShowUpdatingBlock = false;
             else {
                 this._shouldShowUpdatingBlock = true;
-                if (!this._block.isEmpty)
-                    oEnd = Math.max(oStart, oEnd - 1);
+                if (this._block.isEmpty) {
+                    oStart += 1;
+                    const block = yield this.loadBlock(address);
+                    if (block) {
+                        if (block.size !== edgeStore_1.MAX_BLOCK_SIZE) {
+                            address = block.next;
+                            this._block = block;
+                        }
+                        else {
+                            oStart -= 1;
+                        }
+                    }
+                }
             }
             this._committedBlocks = [];
             this._cachedBlocks.setRange(oStart, oEnd);
@@ -172,8 +170,9 @@ class BlockManager {
     }
     getBlocks() {
         const res = [];
-        if (!this._block.isEmpty && this._shouldShowUpdatingBlock)
+        if (!this._block.isEmpty && this._shouldShowUpdatingBlock) {
             res.push(this._block);
+        }
         this._committedBlocks.forEach(el => res.push(el));
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         this._cachedBlocks.forEach(([block, _]) => res.push(block));
