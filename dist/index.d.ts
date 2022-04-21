@@ -697,7 +697,7 @@ declare module "edgeStore" {
     export const ThetaMainnet: ChainType;
     export const ThetaTestnet: ChainType;
     export const ThetaLocalnet: ChainType;
-    export const MAX_BLOCK_SIZE = 2;
+    export const MAX_BLOCK_SIZE = 1024;
     export type EdgeStoreConfigType = {
         protocol?: string;
         domain?: string;

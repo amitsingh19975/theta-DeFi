@@ -23,7 +23,7 @@ export const ThetaLocalnet: ChainType = {
     chainID: 366,
 }
 
-export const MAX_BLOCK_SIZE = 2;
+export const MAX_BLOCK_SIZE = 1024;
 
 export type EdgeStoreConfigType = {
     protocol?: string,
