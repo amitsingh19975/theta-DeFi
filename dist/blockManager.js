@@ -122,6 +122,8 @@ class BlockManager {
                         if (block.size !== edgeStore_1.MAX_BLOCK_SIZE) {
                             address = block.next;
                             this._block = block;
+                            this._initialAddress = address;
+                            this._block.isCommited = false;
                         }
                         else {
                             oStart -= 1;
