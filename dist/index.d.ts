@@ -402,6 +402,7 @@ declare module "fsInternal/directory" {
         removeChildren(children: FileSystem[]): void;
         removeAll(): void;
         serialize(): DirectorySerializeType;
+        reset(): void;
     }
 }
 declare module "fsInternal/types" {

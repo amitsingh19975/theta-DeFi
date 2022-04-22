@@ -112,4 +112,9 @@ export class Directory extends FileSystem {
             isRoot: this.isRoot(),
         }
     }
+
+    reset(): void {
+        this.removeAll();
+        this._size = 0;
+    }
 }

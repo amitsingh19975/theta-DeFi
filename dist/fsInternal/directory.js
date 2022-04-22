@@ -92,6 +92,10 @@ class Directory extends fileSystem_1.FileSystem {
             isRoot: this.isRoot(),
         };
     }
+    reset() {
+        this.removeAll();
+        this._size = 0;
+    }
 }
 exports.Directory = Directory;
 _a = Directory;
